@@ -99,7 +99,7 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">My Properties</h2>
         <button 
-          onclick="showAddPropertyModal()"
+          onclick="window.location.href='property-edit.html'"
           class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700"
         >
           + Add Property
@@ -234,99 +234,128 @@
     function showAddPropertyModal() {
       document.getElementById('addPropertyModal').classList.remove('hidden');
     }
-
-    // Enhance the loadProperties function in dashboard.html
-
-function loadProperties() {
-  const propertiesList = document.getElementById('propertiesList');
-  if (!propertiesList) return;
-  
-  // Clear existing properties
-  propertiesList.innerHTML = '';
-  
-  // Get properties for current user
-  const properties = getUserProperties();
-  
-  if (properties.length === 0) {
-    propertiesList.innerHTML = `
-      <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-        <p class="text-gray-600">You haven't added any properties yet.</p>
-        <button onclick="window.location.href='property-edit.html'" class="mt-4 px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
-          + Add Your First Property
-        </button>
-      </div>
-    `;
-    return;
-  }
-  
-  // Add each property to the list
-  properties.forEach(property => {
-    // Generate carrier badges
-    let carrierBadges = '';
-    if (property.hasInstructions && property.instructions.authorizedCarriers) {
-      const carriers = property.instructions.authorizedCarriers;
-      const activeCarriers = [];
+    
+    // Close add property modal
+    function closeAddPropertyModal() {
+      document.getElementById('addPropertyModal').classList.add('hidden');
+    }
+    
+    // Add new property function
+    function addNewProperty() {
+      // Get form values
+      const propertyName = document.getElementById('propertyName').value;
+      const propertyAddress = document.getElementById('propertyAddress').value;
+      const propertyUnits = document.getElementById('propertyUnits').value;
+      const propertyType = document.getElementById('propertyType').value;
       
-      if (carriers.fedex) activeCarriers.push('FedEx');
-      if (carriers.ups) activeCarriers.push('UPS');
-      if (carriers.usps) activeCarriers.push('USPS');
-      if (carriers.dhl) activeCarriers.push('DHL');
-      if (carriers.amazon) activeCarriers.push('Amazon');
-      if (carriers.ontrac) activeCarriers.push('OnTrac');
-      if (carriers.lasership) activeCarriers.push('LaserShip');
+      // Validate form
+      if (!propertyName || !propertyAddress || !propertyUnits || !propertyType) {
+        alert('Please fill in all fields');
+        return;
+      }
       
-      if (activeCarriers.length > 0) {
-        carrierBadges = `<div class="mt-3 flex flex-wrap gap-1">
-          ${activeCarriers.map(c => `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">${c}</span>`).join('')}
-        </div>`;
+      // Create property data
+      const propertyData = {
+        name: propertyName,
+        address: propertyAddress,
+        units: propertyUnits,
+        type: propertyType
+      };
+      
+      // Add property
+      const result = addProperty(propertyData);
+      
+      if (result.success) {
+        // Close modal
+        closeAddPropertyModal();
+        
+        // Reset form
+        document.getElementById('addPropertyForm').reset();
+        
+        // Reload properties
+        loadProperties();
+      } else {
+        alert(result.message || 'Error adding property');
       }
     }
     
-    const propertyElement = document.createElement('div');
-    propertyElement.className = 'bg-white p-5 rounded-lg shadow-sm border border-gray-200';
-    propertyElement.innerHTML = `
-      <div class="flex justify-between">
-        <div>
-          <h3 class="text-lg font-semibold">${property.name}</h3>
-          <p class="text-gray-600">${property.address}</p>
-          <div class="flex items-center mt-2 text-sm text-gray-500">
-            <span class="mr-4">${property.units} Units</span>
-            ${property.hasInstructions 
-              ? '<span class="text-green-600 font-medium">Instructions Set</span>' 
-              : '<span class="text-amber-600 font-medium">No Instructions</span>'}
+    // Load properties function
+    function loadProperties() {
+      const propertiesList = document.getElementById('propertiesList');
+      if (!propertiesList) return;
+      
+      // Clear existing properties
+      propertiesList.innerHTML = '';
+      
+      // Get properties for current user
+      const properties = getUserProperties();
+      
+      if (properties.length === 0) {
+        propertiesList.innerHTML = `
+          <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+            <p class="text-gray-600">You haven't added any properties yet.</p>
+            <button onclick="showAddPropertyModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
+              + Add Your First Property
+            </button>
           </div>
-          ${carrierBadges}
-        </div>
-        <div class="flex items-center">
-          <a href="property-edit.html?id=${property.id}" class="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-md">
-            ${property.hasInstructions ? 'Edit Instructions' : 'Add Instructions'}
-          </a>
-        </div>
-      </div>
-    `;
-    propertiesList.appendChild(propertyElement);
-  });
-  // Add this to the dashboard.html script
-document.addEventListener('DOMContentLoaded', function() {
-  if (!isLoggedIn()) {
-    // Redirect to login page if not logged in
-    window.location.href = 'login.html';
-    return;
-  }
-  
-  // Get user info
-  const currentUser = getCurrentUser();
-  
-  // Update user info in header
-  document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
-  document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
-  
-  // Load properties
-  loadProperties();
-});
-
-// Get user initials helper function
-function getInitials(firstName, lastName) {
-  return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-}
-}
+        `;
+        return;
+      }
+      
+      // Add each property to the list
+      properties.forEach(property => {
+        // Generate carrier badges if instructions exist
+        let carrierBadges = '';
+        if (property.hasInstructions && property.instructions && property.instructions.authorizedCarriers) {
+          const carriers = property.instructions.authorizedCarriers;
+          const activeCarriers = [];
+          
+          if (carriers.fedex) activeCarriers.push('FedEx');
+          if (carriers.ups) activeCarriers.push('UPS');
+          if (carriers.usps) activeCarriers.push('USPS');
+          if (carriers.dhl) activeCarriers.push('DHL');
+          if (carriers.amazon) activeCarriers.push('Amazon');
+          if (carriers.ontrac) activeCarriers.push('OnTrac');
+          if (carriers.lasership) activeCarriers.push('LaserShip');
+          
+          if (activeCarriers.length > 0) {
+            carrierBadges = `<div class="mt-3 flex flex-wrap gap-1">
+              ${activeCarriers.map(c => `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">${c}</span>`).join('')}
+            </div>`;
+          }
+        }
+        
+        const propertyElement = document.createElement('div');
+        propertyElement.className = 'bg-white p-5 rounded-lg shadow-sm border border-gray-200';
+        propertyElement.innerHTML = `
+          <div class="flex justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">${property.name}</h3>
+              <p class="text-gray-600">${property.address}</p>
+              <div class="flex items-center mt-2 text-sm text-gray-500">
+                <span class="mr-4">${property.units} Units</span>
+                ${property.hasInstructions 
+                  ? '<span class="text-green-600 font-medium">Instructions Set</span>' 
+                  : '<span class="text-amber-600 font-medium">No Instructions</span>'}
+              </div>
+              ${carrierBadges}
+            </div>
+            <div class="flex items-center">
+              <a href="property-edit.html?id=${property.id}" class="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-md">
+                ${property.hasInstructions ? 'Edit Instructions' : 'Add Instructions'}
+              </a>
+            </div>
+          </div>
+        `;
+        propertiesList.appendChild(propertyElement);
+      });
+    }
+    
+    // Function to logout and redirect
+    function logoutAndRedirect() {
+      logoutUser();
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

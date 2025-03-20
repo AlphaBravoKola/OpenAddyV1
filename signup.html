@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign Up - OpenAddy</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="auth.js"></script>
 </head>
 <body class="min-h-screen bg-gray-50">
   <!-- Header -->
@@ -28,6 +29,8 @@
     <div class="container mx-auto px-4 py-12">
       <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-200">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Create Your Account</h2>
+        
+        <div id="signup-error" class="mb-4 p-3 bg-red-100 text-red-700 rounded-md hidden"></div>
         
         <form id="signupForm">
           <div class="grid grid-cols-2 gap-4 mb-4">
@@ -134,72 +137,71 @@
   </footer>
 
   <script>
-    // Handle signup form submission
-document.addEventListener('DOMContentLoaded', function() {
-  // Get the form element
-  const form = document.getElementById('signupForm');
-  
-  // Add submit event listener
-  form.addEventListener('submit', function(event) {
-    // Prevent the default form submission
-    event.preventDefault();
-    
-    // Get form values
-    const firstName = document.getElementById('first_name').value;
-    const lastName = document.getElementById('last_name').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const accountType = document.querySelector('input[name="account_type"]:checked').value;
-    
-    // Create user object
-    const userData = {
-      firstName,
-      lastName,
-      email,
-      password,
-      accountType,
-      company: "" // Optional field
-    };
-    
-    // Get existing users or create empty array
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    
-    // Check if email is already registered
-    if (users.some(user => user.email === email)) {
-      alert('Email already registered. Please use a different email or login.');
-      return;
-    }
-    
-    // Add user to array
-    users.push(userData);
-    
-    // Save to localStorage
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    // Create session (for auto-login)
-    const session = {
-      email: userData.email,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      accountType: userData.accountType,
-      company: userData.company,
-      isLoggedIn: true
-    };
-    
-    // Save current user session
-    localStorage.setItem('currentUser', JSON.stringify(session));
-    
-    // Show success message
-    alert('Account created successfully!');
-    
-    // Redirect based on account type
-    if (accountType === 'landlord') {
-      window.location.href = 'dashboard.html';
-    } else {
-      window.location.href = 'driver-dashboard.html';
-    }
-  });
-});
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if already logged in
+      if (isLoggedIn()) {
+        const currentUser = getCurrentUser();
+        if (currentUser.accountType === 'landlord') {
+          window.location.href = 'dashboard.html';
+        } else {
+          window.location.href = 'driver-dashboard.html';
+        }
+        return;
+      }
+      
+      // Get the form element
+      const form = document.getElementById('signupForm');
+      const errorDiv = document.getElementById('signup-error');
+      
+      // Add submit event listener
+      form.addEventListener('submit', function(event) {
+        // Prevent the default form submission
+        event.preventDefault();
+        
+        // Get form values
+        const firstName = document.getElementById('first_name').value;
+        const lastName = document.getElementById('last_name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const accountType = document.querySelector('input[name="account_type"]:checked').value;
+        
+        // Validate form
+        if (password.length < 6) {
+          errorDiv.textContent = 'Password must be at least 6 characters long';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+        
+        // Create user data
+        const userData = {
+          firstName,
+          lastName,
+          email,
+          password,
+          accountType,
+          createdAt: new Date().toISOString()
+        };
+        
+        // Register user
+        const result = registerUser(userData);
+        
+        if (result.success) {
+          // Show success message
+          alert('Account created successfully! Redirecting to dashboard...');
+          
+          // Redirect based on account type
+          if (accountType === 'landlord') {
+            window.location.href = 'dashboard.html';
+          } else {
+            window.location.href = 'driver-dashboard.html';
+          }
+        } else {
+          // Show error message
+          errorDiv.textContent = result.message || 'Error creating account';
+          errorDiv.classList.remove('hidden');
+        }
+      });
+    });
   </script>
 </body>
 </html>
