@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Property Instructions - OpenAddy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <a href="index.html" class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+            <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path>
+            <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"></path>
+            <path d="M12 3v6"></path>
+          </svg>
+          <h1 class="text-xl font-bold text-gray-800">OpenAddy</h1>
+        </a>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <button class="flex items-center text-gray-700 hover:text-gray-900">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">JD</div>
+            <span class="ml-2 font-medium">John Doe</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white shadow-sm border-r border-gray-200 hidden md:block">
+      <nav class="p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="dashboard.html" class="flex items-center px-4 py-3 bg-blue-50 text-blue-600 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <path d="M9 18V9"></path>
+                <path d="M15 18v-6"></path>
+              </svg>
+              <span class="font-medium">My Properties</span>
+            </a>
+          </li>
+          <li>
+            <a href="package-claims.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <path d="M12 9v4"></path>
+                <path d="M12 17h.01"></path>
+              </svg>
+              <span class="font-medium">Package Claims</span>
+            </a>
+          </li>
+          <li>
+            <a href="special-instructions.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="font-medium">Special Instructions</span>
+            </a>
+          </li>
+          <li>
+            <a href="account-settings.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span class="font-medium">Account Settings</span>
+            </a>
+          </li>
+          <li>
+            <a href="index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span class="font-medium">Logout</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main content area -->
+    <div class="flex-1 p-6">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center mb-6">
+          <a href="dashboard.html" class="mr-4 text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+          </a>
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">Campus View Apartments</h2>
+            <p class="text-gray-600">123 University Ave, College Town, CT 12345</p>
+          </div>
+        </div>
+        
+        <div class="space-y-6">
+          <!-- Property Address with Simplified Input -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Property Address
+            </label>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Street Address</label>
+                <input 
+                  type="text"
+                  id="streetAddress"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  value="123 University Ave"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">City</label>
+                  <input 
+                    type="text"
+                    id="city"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    value="College Town"
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-xs text-gray-500 mb-1">State</label>
+                    <input 
+                      type="text"
+                      id="state"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      value="CT"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-xs text-gray-500 mb-1">ZIP Code</label>
+                    <input 
+                      type="text"
+                      id="zipCode"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      value="12345"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- General Instructions -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              General Delivery Instructions
+            </label>
+            <textarea 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              rows="4"
+              placeholder="Enter general instructions for all delivery services..."
+            >Access main entrance through gate on University Ave. Gate code: #1234. All packages should be delivered to the package room on the first floor, to the left of the main entrance. For large packages, please call the property manager at (555) 123-4567.</textarea>
+          </div>
+          
+          <!-- Authorized Delivery Services -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Authorized Delivery Services
+            </label>
+            <p class="text-gray-600 mb-3 text-sm">Select which delivery services are authorized to access this building</p>
+            
+            <div class="grid md:grid-cols-2 gap-3">
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="fedex" 
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked
+                />
+                <label for="fedex" class="ml-2 text-sm text-gray-700">
+                  FedEx
+                </label>
+              </div>
+              
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="ups" 
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked
+                />
+                <label for="ups" class="ml-2 text-sm text-gray-700">
+                  UPS
+                </label>
+              </div>
+              
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="usps" 
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked
+                />
+                <label for="usps" class="ml-2 text-sm text-gray-700">
+                  USPS (United States Postal Service)
+                </label>
+              </div>
+              
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="dhl" 
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked
+                />
+                <label for="dhl" class="ml-2 text-sm text-gray-700">
+                  DHL
+                </label>
+              </div>
+              
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="amazon" 
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked
+                />
+                <label for="amazon" class="ml-2 text-sm text-gray-700">
+                  Amazon Logistics
+                </label>
+              </div>
+              
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="ontrac" 
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label for="ontrac" class="ml-2 text-sm text-gray-700">
+                  OnTrac
+                </label>
+              </div>
+              
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="lasership" 
+                  class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label for="lasership" class="ml-2 text-sm text-gray-700">
+                  LaserShip
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Access Codes -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Access Codes
+            </label>
+            <div id="accessCodesContainer" class="space-y-2">
+              <div class="flex">
+                <input 
+                  type="text" 
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 access-code"
+                  placeholder="Enter an access code..."
+                  value="#1234"
+                />
+                <button 
+                  type="button"
+                  class="ml-2 px-3 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200"
+                  onclick="addAccessCode()"
+                >
+                  + Add Another
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Package Room -->
+          <div>
+            <div class="flex items-center mb-2">
+              <input 
+                type="checkbox" 
+                id="hasPackageRoom" 
+                class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                checked
+              />
+              <label for="hasPackageRoom" class="ml-2 text-sm font-medium text-gray-700">
+                This property has a dedicated package room
+              </label>
+            </div>
+            
+            <input 
+              type="text" 
+              id="packageRoomLocation"
+              class="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Where is the package room located?"
+              value="First floor, left of main entrance"
+            />
+          </div>
+          
+          <!-- Amazon Lockers -->
+          <div>
+            <div class="flex items-center">
+              <input 
+                type="checkbox" 
+                id="hasAmazonLockers" 
+                class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                checked
+              />
+              <label for="hasAmazonLockers" class="ml-2 text-sm font-medium text-gray-700">
+                This property has Amazon lockers or similar storage system
+              </label>
+            </div>
+          </div>
+          
+          <!-- Carrier-Specific Instructions -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Carrier-Specific Instructions (Optional)
+            </label>
+            
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm text-gray-600 mb-1">USPS</label>
+                <input 
+                  type="text" 
+                  id="uspsInstructions"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Special instructions for USPS..."
+                  value="Use master key for mailroom access"
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm text-gray-600 mb-1">FedEx</label>
+                <input 
+                  type="text" 
+                  id="fedexInstructions"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Special instructions for FedEx..."
+                  value="For weekend deliveries, call property manager"
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm text-gray-600 mb-1">UPS</label>
+                <input 
+                  type="text" 
+                  id="upsInstructions"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Special instructions for UPS..."
+                  value="Deliver directly to package room"
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm text-gray-600 mb-1">Amazon</label>
+                <input 
+                  type="text" 
+                  id="amazonInstructions"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Special instructions for Amazon..."
+                  value="Access Amazon lockers via side entrance"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <!-- Photo Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Property Photos (Optional)
+            </label>
+            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div class="space-y-1 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <div class="flex text-sm text-gray-600">
+                  <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                    <span>Upload photos</span>
+                    <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple accept="image/*">
+                  </label>
+                  <p class="pl-1">or drag and drop</p>
+                </div>
+                <p class="text-xs text-gray-500">
+                  PNG, JPG, GIF up to 10MB
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Save Button -->
+          <div class="flex justify-end pt-4">
+            <button 
+              class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700"
+              onclick="savePropertyInfo()"
+            >
+              Save Instructions
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to add another access code input
+    function addAccessCode() {
+      const container = document.getElementById('accessCodesContainer');
+      const newInput = document.createElement('div');
+      newInput.className = 'flex';
+      newInput.innerHTML = `
+        <input 
+          type="text" 
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 access-code"
+          placeholder="Enter an access code..."
+        />
+        <button 
+          type="button"
+          class="ml-2 px-3 py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200"
+          onclick="this.parentElement.remove()"
+        >
+          Remove
+        </button>
+      `;
+      container.appendChild(newInput);
+    }
+
+    // Function to save property information
+    function savePropertyInfo() {
+      // Get all the property information
+      const streetAddress = document.getElementById('streetAddress').value;
+      const city = document.getElementById('city').value;
+      const state = document.getElementById('state').value;
+      const zipCode = document.getElementById('zipCode').value;
+      const fullAddress = `${streetAddress}, ${city}, ${state} ${zipCode}`;
+      
+      // Get access codes
+      const accessCodeElements = document.querySelectorAll('.access-code');
+      const accessCodes = Array.from(accessCodeElements).map(el => el.value).filter(code => code.trim() !== '');
+      
+      // Get carrier permissions
+      const carriers = {
+        fedex: document.getElementById('fedex').checked,
+        ups: document.getElementById('ups').checked,
+        usps: document.getElementById('usps').checked,
+        dhl: document.getElementById('dhl').checked,
+        amazon: document.getElementById('amazon').checked,
+        ontrac: document.getElementById('ontrac').checked,
+        lasership: document.getElementById('lasership').checked
+      };
+      
+      // Get other information
+      const hasPackageRoom = document.getElementById('hasPackageRoom').checked;
+      const packageRoomLocation = document.getElementById('packageRoomLocation').value;
+      const hasAmazonLockers = document.getElementById('hasAmazonLockers').checked;
+      
+      // Get carrier-specific instructions
+      const carrierInstructions = {
+        usps: document.getElementById('uspsInstructions').value,
+        fedex: document.getElementById('fedexInstructions').value,
+        ups: document.getElementById('upsInstructions').value,
+        amazon: document.getElementById('amazonInstructions').value
+      };
+      
+      // In a real app, you would save this to a server
+      // For now, we'll just store it in localStorage as an example
+      const propertyData = {
+        fullAddress,
+        streetAddress,
+        city,
+        state,
+        zipCode,
+        accessCodes,
+        carriers,
+        hasPackageRoom,
+        packageRoomLocation,
+        hasAmazonLockers,
+        carrierInstructions
+      };
+      
+      // Save to localStorage (in a real app, this would be an API call)
+      localStorage.setItem('property_1', JSON.stringify(propertyData));
+      
+      // Show success message
+      alert('Property information saved successfully!');
+      
+      // Redirect back to dashboard
+      window.location.href = 'dashboard.html';
+    }
+// Add another access code input
+function addAccessCode() {
+      const container = document.getElementById('accessCodesContainer');
+      const newInput = document.createElement('div');
+      newInput.className = 'flex';
+      newInput.innerHTML = `
+        <input 
+          type="text" 
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 access-code"
+          placeholder="Enter an access code..."
+        />
+        <button 
+          type="button"
+          class="ml-2 px-3 py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200"
+          onclick="this.parentElement.remove()"
+        >
+          Remove
+        </button>
+      `;
+      container.appendChild(newInput);
+    }
+    
+    // Handle file upload
+    function handleFileUpload(e) {
+      const files = e.target.files;
+      if (!files.length) return;
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Check if it's an image
+        if (!file.type.startsWith('image/')) {
+          alert('Please upload image files only');
+          continue;
+        }
+        
+        // Check file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File size must be less than 10MB');
+          continue;
+        }
+        
+        // Convert to data URL
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          uploadedPhotos.push(event.target.result);
+          updatePhotoDisplay();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    
+    // Update photo display
+    function updatePhotoDisplay() {
+      const container = document.getElementById('uploadedPhotos');
+      container.innerHTML = '';
+      
+      uploadedPhotos.forEach((photo, index) => {
+        const photoElement = document.createElement('div');
+        photoElement.className = 'relative group';
+        photoElement.innerHTML = `
+          <img src="${photo}" alt="Property photo" class="w-full h-32 object-cover rounded-md">
+          <button 
+            type="button"
+            class="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+            onclick="removePhoto(${index})"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        `;
+        container.appendChild(photoElement);
+      });
+    }
+    
+    // Remove photo
+    function removePhoto(index) {
+      uploadedPhotos.splice(index, 1);
+      updatePhotoDisplay();
+    }
+    
+    // Save property information
+    function savePropertyInfo() {
+      // Get all the property information
+      const generalInstructions = document.getElementById('generalInstructions').value;
+      
+      // Get access codes
+      const accessCodeElements = document.querySelectorAll('.access-code');
+      const accessCodes = Array.from(accessCodeElements).map(el => el.value).filter(code => code.trim() !== '');
+      
+      // Get carrier permissions
+      const carriers = {
+        fedex: document.getElementById('fedex').checked,
+        ups: document.getElementById('ups').checked,
+        usps: document.getElementById('usps').checked,
+        dhl: document.getElementById('dhl').checked,
+        amazon: document.getElementById('amazon').checked,
+        ontrac: document.getElementById('ontrac').checked,
+        lasership: document.getElementById('lasership').checked
+      };
+      
+      // Get other information
+      const hasPackageRoom = document.getElementById('hasPackageRoom').checked;
+      const packageRoomLocation = document.getElementById('packageRoomLocation').value;
+      const hasAmazonLockers = document.getElementById('hasAmazonLockers').checked;
+      
+      // Get carrier-specific instructions
+      const carrierInstructions = {
+        usps: document.getElementById('uspsInstructions').value,
+        fedex: document.getElementById('fedexInstructions').value,
+        ups: document.getElementById('upsInstructions').value,
+        amazon: document.getElementById('amazonInstructions').value
+      };
+      
+      // Create instructions object
+      const instructions = {
+        general: generalInstructions,
+        accessCodes,
+        authorizedCarriers: carriers,
+        hasPackageRoom,
+        packageRoomLocation,
+        hasAmazonLockers,
+        carrierInstructions,
+        photos: uploadedPhotos
+      };
+      
+      // Update property in storage
+      let properties = JSON.parse(localStorage.getItem('properties') || '[]');
+      const propertyIndex = properties.findIndex(p => p.id.toString() === propertyId.toString());
+      
+      if (propertyIndex === -1) {
+        alert('Property not found');
+        return;
+      }
+      
+      // Update property
+      properties[propertyIndex].hasInstructions = true;
+      properties[propertyIndex].instructions = instructions;
+      
+      // Save back to localStorage
+      localStorage.setItem('properties', JSON.stringify(properties));
+      
+      // Show success message
+      alert('Property information saved successfully!');
+      
+      // Redirect back to dashboard
+      window.location.href = 'dashboard.html';
+    }
+    
+    // Function to logout and redirect
+    function logoutAndRedirect() {
+      logoutUser();
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - OpenAddy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="auth.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <a href="index.html" class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+            <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path>
+            <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"></path>
+            <path d="M12 3v6"></path>
+          </svg>
+          <h1 class="text-xl font-bold text-gray-800">OpenAddy</h1>
+        </a>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <button id="userMenuButton" class="flex items-center text-gray-700 hover:text-gray-900">
+            <div id="userInitials" class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">JD</div>
+            <span id="userName" class="ml-2 font-medium">John Doe</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white shadow-sm border-r border-gray-200 hidden md:block">
+      <nav class="p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="dashboard.html" class="flex items-center px-4 py-3 bg-blue-50 text-blue-600 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <path d="M9 18V9"></path>
+                <path d="M15 18v-6"></path>
+              </svg>
+              <span class="font-medium">My Properties</span>
+            </a>
+          </li>
+          <li>
+            <a href="package-claims.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <path d="M12 9v4"></path>
+                <path d="M12 17h.01"></path>
+              </svg>
+              <span class="font-medium">Package Claims</span>
+            </a>
+          </li>
+          <li>
+            <a href="special-instructions.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="font-medium">Special Instructions</span>
+            </a>
+          </li>
+          <li>
+            <a href="account-settings.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span class="font-medium">Account Settings</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" onclick="logoutAndRedirect()" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span class="font-medium">Logout</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main content area -->
+    <div class="flex-1 p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">My Properties</h2>
+        <button 
+          onclick="showAddPropertyModal()"
+          class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700"
+        >
+          + Add Property
+        </button>
+      </div>
+      
+      <div id="propertiesList" class="grid md:grid-cols-1 gap-4">
+        <!-- Properties will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Property Modal -->
+  <div id="addPropertyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Add New Property</h3>
+        <button onclick="closeAddPropertyModal()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="addPropertyForm">
+        <div class="mb-4">
+          <label for="propertyName" class="block text-sm font-medium text-gray-700 mb-1">Property Name</label>
+          <input 
+            type="text" 
+            id="propertyName" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter property name"
+            required
+          />
+        </div>
+        
+        <div class="mb-4">
+          <label for="propertyAddress" class="block text-sm font-medium text-gray-700 mb-1">Property Address</label>
+          <input 
+            type="text" 
+            id="propertyAddress" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter full address"
+            required
+          />
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="propertyUnits" class="block text-sm font-medium text-gray-700 mb-1">Number of Units</label>
+            <input 
+              type="number" 
+              id="propertyUnits" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. 24"
+              required
+            />
+          </div>
+          
+          <div>
+            <label for="propertyType" class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+            <select 
+              id="propertyType" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Select type</option>
+              <option value="apartment">Apartment Building</option>
+              <option value="condo">Condominium</option>
+              <option value="townhouse">Townhouse</option>
+              <option value="single-family">Single Family Home</option>
+              <option value="office">Office Building</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="flex justify-end mt-6">
+          <button type="button" onclick="closeAddPropertyModal()" class="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 mr-2">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
+            Add Property
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!isLoggedIn()) {
+        // Redirect to login page if not logged in
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Get user info
+      const currentUser = getCurrentUser();
+      
+      // Make sure user is a landlord
+      if (currentUser.accountType !== 'landlord') {
+        window.location.href = 'driver-dashboard.html';
+        return;
+      }
+      
+      // Update user info in header
+      document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
+      document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+      
+      // Load properties
+      loadProperties();
+      
+      // Initialize form
+      const addPropertyForm = document.getElementById('addPropertyForm');
+      if (addPropertyForm) {
+        addPropertyForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          addNewProperty();
+        });
+      }
+    });
+    
+    // Get user initials
+    function getInitials(firstName, lastName) {
+      return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    }
+    
+    // Show add property modal
+    function showAddPropertyModal() {
+      document.getElementById('addPropertyModal').classList.remove('hidden');
+    }

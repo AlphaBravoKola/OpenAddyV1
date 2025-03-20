@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Package Claims - OpenAddy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="auth.js"></script>
+  <script src="package-claims.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <a href="index.html" class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+            <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path>
+            <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"></path>
+            <path d="M12 3v6"></path>
+          </svg>
+          <h1 class="text-xl font-bold text-gray-800">OpenAddy</h1>
+        </a>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <button id="userMenuButton" class="flex items-center text-gray-700 hover:text-gray-900">
+            <div id="userInitials" class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">JD</div>
+            <span id="userName" class="ml-2 font-medium">John Doe</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white shadow-sm border-r border-gray-200 hidden md:block">
+      <nav class="p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <path d="M9 18V9"></path>
+                <path d="M15 18v-6"></path>
+              </svg>
+              <span class="font-medium">My Properties</span>
+            </a>
+          </li>
+          <li>
+            <a href="package-claims.html" class="flex items-center px-4 py-3 bg-blue-50 text-blue-600 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <path d="M12 9v4"></path>
+                <path d="M12 17h.01"></path>
+              </svg>
+              <span class="font-medium">Package Claims</span>
+            </a>
+          </li>
+          <li>
+            <a href="special-instructions.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="font-medium">Special Instructions</span>
+            </a>
+          </li>
+          <li>
+            <a href="account-settings.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span class="font-medium">Account Settings</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" onclick="logoutAndRedirect()" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span class="font-medium">Logout</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main content area -->
+    <div class="flex-1 p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Package Claims</h2>
+        <button 
+          onclick="showAddClaimModal()"
+          class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700"
+        >
+          + Add Claim
+        </button>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="filterProperty" class="block text-sm font-medium text-gray-700 mb-1">Filter by Property</label>
+            <select id="filterProperty" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" onchange="filterClaims()">
+              <option value="">All Properties</option>
+              <!-- Properties will be loaded here -->
+            </select>
+          </div>
+          <div>
+            <label for="filterStatus" class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+            <select id="filterStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" onchange="filterClaims()">
+              <option value="">All Statuses</option>
+              <option value="open">Open</option>
+              <option value="investigating">Investigating</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterDeliveryService" class="block text-sm font-medium text-gray-700 mb-1">Filter by Delivery Service</label>
+            <select id="filterDeliveryService" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" onchange="filterClaims()">
+              <option value="">All Services</option>
+              <option value="fedex">FedEx</option>
+              <option value="ups">UPS</option>
+              <option value="usps">USPS</option>
+              <option value="dhl">DHL</option>
+              <option value="amazon">Amazon</option>
+              <option value="ontrac">OnTrac</option>
+              <option value="lasership">LaserShip</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Claims List -->
+      <div id="claimsList" class="space-y-4">
+        <!-- Claims will be loaded here -->
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+          <p class="text-gray-600">No package claims found.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Claim Modal -->
+  <div id="addClaimModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Add Package Claim</h3>
+        <button onclick="closeAddClaimModal()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="addClaimForm">
+        <div class="mb-4">
+          <label for="claimProperty" class="block text-sm font-medium text-gray-700 mb-1">Property</label>
+          <select 
+            id="claimProperty" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select property</option>
+            <!-- Properties will be loaded here -->
+          </select>
+        </div>
+        
+        <div class="mb-4">
+          <label for="recipientName" class="block text-sm font-medium text-gray-700 mb-1">Recipient Name</label>
+          <input 
+            type="text" 
+            id="recipientName" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter recipient's name"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="deliveryService" class="block text-sm font-medium text-gray-700 mb-1">Delivery Service</label>
+          <select 
+            id="deliveryService" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select delivery service</option>
+            <option value="fedex">FedEx</option>
+            <option value="ups">UPS</option>
+            <option value="usps">USPS</option>
+            <option value="dhl">DHL</option>
+            <option value="amazon">Amazon</option>
+            <option value="ontrac">OnTrac</option>
+            <option value="lasership">LaserShip</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="packageCount" class="block text-sm font-medium text-gray-700 mb-1">Number of Packages</label>
+            <input 
+              type="number" 
+              id="packageCount" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. 1"
+              min="1"
+              value="1"
+            />
+          </div>
+          
+          <div>
+            <label for="packageSize" class="block text-sm font-medium text-gray-700 mb-1">Package Size</label>
+            <select 
+              id="packageSize" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+              <option value="extra-large">Extra Large</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="claimIssue" class="block text-sm font-medium text-gray-700 mb-1">Issue Description</label>
+          <select 
+            id="claimIssue" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select issue type</option>
+            <option value="missing">Missing Package</option>
+            <option value="damaged">Damaged Package</option>
+            <option value="wrong-delivery">Wrong Delivery Location</option>
+            <option value="unexpected">Unexpected Delivery</option>
+            <option value="other">Other Issue</option>
+          </select>
+        </div>
+        
+        <div class="mb-4">
+          <label for="claimDescription" class="block text-sm font-medium text-gray-700 mb-1">Additional Details</label>
+          <textarea 
+            id="claimDescription" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            rows="3"
+            placeholder="Provide any additional details about the issue..."
+          ></textarea>
+        </div>
+        
+        <div class="flex justify-end mt-6">
+          <button type="button" onclick="closeAddClaimModal()" class="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 mr-2">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
+            Submit Claim
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!isLoggedIn()) {
+        // Redirect to login page if not logged in
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Get user info
+      const currentUser = getCurrentUser();
+      
+      // Make sure user is a landlord
+      if (currentUser.accountType !== 'landlord') {
+        window.location.href = 'driver-dashboard.html';
+        return;
+      }
+      
+      // Update user info in header
+      document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
+      document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+      
+      // Load properties for dropdown
+      loadPropertiesForDropdown();
+      
+      // Load claims
+      loadClaims();
+      
+      // Initialize form
+      const addClaimForm = document.getElementById('addClaimForm');
+      if (addClaimForm) {
+        addClaimForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          addNewClaim();
+        });
+      }
+    });
+    
+    // Get user initials
+    function getInitials(firstName, lastName) {
+      return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    }
+    
+    // Show add claim modal
+    function showAddClaimModal() {
+      document.getElementById('addClaimModal').classList.remove('hidden');
+    }
+    
+    // Close add claim modal
+    function closeAddClaimModal() {
+      document.getElementById('addClaimModal').classList.add('hidden');
+    }
+    
+    // Load properties for dropdown
+    function loadPropertiesForDropdown() {
+      const properties = getUserProperties();
+      const claimPropertyDropdown = document.getElementById('claimProperty');
+      const filterPropertyDropdown = document.getElementById('filterProperty');
+      
+      // Clear existing options (except the default)
+      while (claimPropertyDropdown.options.length > 1) {
+        claimPropertyDropdown.remove(1);
+      }
+      
+      // Add properties to dropdown
+      properties.forEach(property => {
+        const option = document.createElement('option');
+        option.value = property.id;
+        option.textContent = property.name;
+        claimPropertyDropdown.appendChild(option);
+        
+        // Also add to filter dropdown
+        const filterOption = document.createElement('option');
+        filterOption.value = property.id;
+        filterOption.textContent = property.name;
+        filterPropertyDropdown.appendChild(filterOption);
+      });
+    }
+    
+    // Add new claim
+    function addNewClaim() {
+      // Get form values
+      const propertyId = document.getElementById('claimProperty').value;
+      const recipientName = document.getElementById('recipientName').value;
+      const deliveryService = document.getElementById('deliveryService').value;
+      const packageCount = document.getElementById('packageCount').value || 1;
+      const packageSize = document.getElementById('packageSize').value;
+      const claimIssue = document.getElementById('claimIssue').value;
+      const claimDescription = document.getElementById('claimDescription').value;
+      
+      // Validate form
+      if (!propertyId || !recipientName || !deliveryService || !claimIssue) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      // Get current user
+      const currentUser = getCurrentUser();
+      
+      // Get selected property details
+      const properties = getUserProperties();
+      const property = properties.find(p => p.id.toString() === propertyId.toString());
+      
+      if (!property) {
+        alert('Invalid property selected');
+        return;
+      }
+      
+      // Get existing claims
+      let claims = JSON.parse(localStorage.getItem('packageClaims') || '[]');
+      
+      // Create new claim
+      const newClaim = {
+        id: Date.now(),
+        propertyId: parseInt(propertyId),
+        propertyName: property.name,
+        recipientName,
+        deliveryService,
+        packageCount: parseInt(packageCount),
+        packageSize,
+        issue: claimIssue,
+        description: claimDescription,
+        status: 'open',
+        owner: currentUser.email,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Add to array
+      claims.push(newClaim);
+      
+      // Save back to localStorage
+      localStorage.setItem('packageClaims', JSON.stringify(claims));
+      
+      // Close modal
+      closeAddClaimModal();
+      
+      // Reset form
+      document.getElementById('addClaimForm').reset();
+      
+      // Reload claims
+      loadClaims();
+    }
+    
+    // Load claims
+    function loadClaims() {
+      const claimsList = document.getElementById('claimsList');
+      if (!claimsList) return;
+      
+      // Get current user
+      const currentUser = getCurrentUser();
+      
+      // Get claims from localStorage
+      let claims = JSON.parse(localStorage.getItem('packageClaims') || '[]');
+      
+      // Filter claims for current user
+      claims = claims.filter(claim => claim.owner === currentUser.email);
+      
+      // Apply filters if any
+      const propertyFilter = document.getElementById('filterProperty').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+      const serviceFilter = document.getElementById('filterDeliveryService').value;
+      
+      if (propertyFilter) {
+        claims = claims.filter(claim => claim.propertyId.toString() === propertyFilter);
+      }
+      
+      if (statusFilter) {
+        claims = claims.filter(claim => claim.status === statusFilter);
+      }
+      
+      if (serviceFilter) {
+        claims = claims.filter(claim => claim.deliveryService === serviceFilter);
+      }
+      
+      // Sort claims by creation date (newest first)
+      claims.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      // Clear claims list
+      claimsList.innerHTML = '';
+      
+      // Check if there are any claims
+      if (claims.length === 0) {
+        claimsList.innerHTML = `
+          <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+            <p class="text-gray-600">No package claims found.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Add claims to list
+      claims.forEach(claim => {
+        const claimElement = document.createElement('div');
+        claimElement.className = 'bg-white p-5 rounded-lg shadow-sm border border-gray-200';
+        
+        // Determine status badge style
+        let statusBadge = '';
+        if (claim.status === 'open') {
+          statusBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">Open</span>';
+        } else if (claim.status === 'investigating') {
+          statusBadge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">Investigating</span>';
+        } else if (claim.status === 'resolved') {
+          statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Resolved</span>';
+        }
+        
+        // Format date
+        const createdDate = new Date(claim.createdAt).toLocaleDateString();
+        
+        claimElement.innerHTML = `
+          <div class="flex justify-between">
+            <div>
+              <div class="flex items-center mb-2">
+                <h3 class="text-lg font-semibold mr-2">${claim.recipientName}</h3>
+                ${statusBadge}
+              </div>
+              <p class="text-gray-600 mb-1">${claim.propertyName}</p>
+              <div class="flex items-center mt-2 text-sm text-gray-500">
+                <span class="mr-4">${claim.deliveryService.toUpperCase()}</span>
+                <span class="mr-4">${claim.packageCount} ${claim.packageCount > 1 ? 'packages' : 'package'}</span>
+                <span>${claim.packageSize.charAt(0).toUpperCase() + claim.packageSize.slice(1)} size</span>
+              </div>
+              <p class="text-gray-600 mt-2">
+                <strong>Issue:</strong> ${formatIssueType(claim.issue)}
+              </p>
+              ${claim.description ? `<p class="text-gray-600 mt-1 text-sm">${claim.description}</p>` : ''}
+              <p class="text-xs text-gray-500 mt-3">Claim filed on ${createdDate}</p>
+            </div>
+            <div class="flex items-center">
+              <button onclick="updateClaimStatus(${claim.id})" class="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-md">
+                ${claim.status === 'open' ? 'Mark Investigating' : claim.status === 'investigating' ? 'Mark Resolved' : 'Reopen Claim'}
+              </button>
+            </div>
+          </div>
+        `;
+        claimsList.appendChild(claimElement);
+      });
+    }
+    
+    // Format issue type
+    function formatIssueType(issue) {
+      switch(issue) {
+        case 'missing':
+          return 'Missing Package';
+        case 'damaged':
+          return 'Damaged Package';
+        case 'wrong-delivery':
+          return 'Wrong Delivery Location';
+        case 'unexpected':
+          return 'Unexpected Delivery';
+        case 'other':
+          return 'Other Issue';
+        default:
+          return issue;
+      }
+    }
+    
+    // Update claim status
+    function updateClaimStatus(claimId) {
+      // Get claims from localStorage
+      let claims = JSON.parse(localStorage.getItem('packageClaims') || '[]');
+      
+      // Find the claim
+      const claimIndex = claims.findIndex(claim => claim.id === claimId);
+      
+      if (claimIndex === -1) {
+        alert('Claim not found');
+        return;
+      }
+      
+      // Update status based on current status
+      switch(claims[claimIndex].status) {
+        case 'open':
+          claims[claimIndex].status = 'investigating';
+          break;
+        case 'investigating':
+          claims[claimIndex].status = 'resolved';
+          break;
+        case 'resolved':
+          claims[claimIndex].status = 'open';
+          break;
+      }
+      
+      // Update timestamp
+      claims[claimIndex].updatedAt = new Date().toISOString();
+      
+      // Save back to localStorage
+      localStorage.setItem('packageClaims', JSON.stringify(claims));
+      
+      // Reload claims
+      loadClaims();
+    }
+    
+    // Filter claims
+    function filterClaims() {
+      loadClaims();
+    }
+    
+    // Function to logout and redirect
+    function logoutAndRedirect() {
+      logoutUser();
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
