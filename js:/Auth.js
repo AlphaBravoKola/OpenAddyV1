@@ -71,3 +71,29 @@ function addProperty(propertyData) {
     const properties = JSON.parse(localStorage.getItem('properties') || '[]');
     return properties.find(p => p.id.toString() === propertyId.toString());
   }
+  // Function to authenticate a user
+function authenticateUser(email, password) {
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    
+    // Find user with matching email and password
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (user) {
+      // Create a session object (exclude password for security)
+      const session = {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        accountType: user.accountType,
+        company: user.company,
+        isLoggedIn: true
+      };
+      
+      // Save current user session
+      localStorage.setItem('currentUser', JSON.stringify(session));
+      return true;
+    }
+    
+    return false;
+  }

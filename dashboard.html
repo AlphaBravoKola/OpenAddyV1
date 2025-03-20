@@ -306,4 +306,27 @@ function loadProperties() {
     `;
     propertiesList.appendChild(propertyElement);
   });
+  // Add this to the dashboard.html script
+document.addEventListener('DOMContentLoaded', function() {
+  if (!isLoggedIn()) {
+    // Redirect to login page if not logged in
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Get user info
+  const currentUser = getCurrentUser();
+  
+  // Update user info in header
+  document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
+  document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+  
+  // Load properties
+  loadProperties();
+});
+
+// Get user initials helper function
+function getInitials(firstName, lastName) {
+  return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+}
 }
