@@ -193,9 +193,24 @@ async function deleteProperty(propertyId) {
   }
 }
 
-// Database functions for instructions
+// Property Instructions functions
 async function savePropertyInstructions(propertyId, instructions) {
   try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // First, verify the property belongs to the user
+    const { data: property, error: propertyError } = await supabaseClient
+      .from('properties')
+      .select('id')
+      .eq('id', propertyId)
+      .eq('landlord_id', user.id)
+      .single();
+
+    if (propertyError || !property) {
+      throw new Error('Property not found or unauthorized');
+    }
+
     const { data, error } = await supabaseClient
       .from('property_instructions')
       .upsert({
@@ -212,6 +227,38 @@ async function savePropertyInstructions(propertyId, instructions) {
   }
 }
 
+async function getPropertyInstructions(propertyId) {
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // First, verify the property belongs to the user
+    const { data: property, error: propertyError } = await supabaseClient
+      .from('properties')
+      .select('id')
+      .eq('id', propertyId)
+      .eq('landlord_id', user.id)
+      .single();
+
+    if (propertyError || !property) {
+      throw new Error('Property not found or unauthorized');
+    }
+
+    const { data, error } = await supabaseClient
+      .from('property_instructions')
+      .select('*')
+      .eq('property_id', propertyId)
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error getting property instructions:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+// Database functions for instructions
 async function saveSpecialInstruction(userId, title, content) {
   try {
     const { data, error } = await supabaseClient
@@ -274,6 +321,7 @@ window.supabaseFunctions = {
   updateProperty,
   deleteProperty,
   savePropertyInstructions,
+  getPropertyInstructions,
   saveSpecialInstruction,
   getSpecialInstructions,
   deleteSpecialInstruction

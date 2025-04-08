@@ -23,13 +23,18 @@
       
       <div class="flex items-center space-x-4">
         <div class="relative">
-          <button class="flex items-center text-gray-700 hover:text-gray-900">
-            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">JD</div>
+          <button id="profileButton" class="flex items-center text-gray-700 hover:text-gray-900">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium" id="userInitials">JD</div>
             <span class="ml-2 font-medium" id="userName"></span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
+          <!-- Profile Dropdown Menu -->
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+            <a href="account-settings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account Settings</a>
+            <button id="logoutButton" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+          </div>
         </div>
       </div>
     </div>
@@ -165,7 +170,11 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const profileButton = document.getElementById('profileButton');
+      const profileMenu = document.getElementById('profileMenu');
+      const logoutButton = document.getElementById('logoutButton');
       const propertyForm = document.getElementById('propertyForm');
+      const userInitials = document.getElementById('userInitials');
+      const userName = document.getElementById('userName');
 
       // Check if user is logged in
       const { data: { user } } = await supabaseClient.auth.getUser();
@@ -174,100 +183,132 @@
         return;
       }
 
+      // Set user name and initials
+      const firstName = user.user_metadata.first_name || '';
+      const lastName = user.user_metadata.last_name || '';
+      userName.textContent = `${firstName} ${lastName}`;
+      userInitials.textContent = `${firstName.charAt(0)}${lastName.charAt(0)}`;
+
+      // Toggle profile menu
+      profileButton.addEventListener('click', () => {
+        profileMenu.classList.toggle('hidden');
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+          profileMenu.classList.add('hidden');
+        }
+      });
+
+      // Handle logout
+      logoutButton.addEventListener('click', async () => {
+        const { error } = await supabaseClient.auth.signOut();
+        if (!error) {
+          window.location.href = 'login.html';
+        }
+      });
+
       // Get property ID from URL
       const urlParams = new URLSearchParams(window.location.search);
       const propertyId = urlParams.get('id');
 
       if (propertyId) {
         // Load existing property data
-        const { success, data } = await getUserProperties(user.id);
-        if (success) {
-          const property = data.find(p => p.id === propertyId);
-          if (property) {
-            document.getElementById('propertyName').value = property.name || '';
-            document.getElementById('propertyAddress').value = property.address || '';
-            
-            // Load property instructions if they exist
-            const { success: instructionsSuccess, data: instructionsData } = await supabaseClient
-              .from('property_instructions')
-              .select('*')
-              .eq('property_id', propertyId)
-              .single();
+        const { data: properties, error: propertiesError } = await supabaseClient
+          .from('properties')
+          .select('*')
+          .eq('id', propertyId)
+          .single();
 
-            if (instructionsSuccess && instructionsData) {
-              const instructions = instructionsData.instructions;
-              document.getElementById('packageLocation').value = instructions.packageLocation || '';
-              document.getElementById('specialInstructions').value = instructions.specialInstructions || '';
-              document.getElementById('accessCode').value = instructions.accessCode || '';
-              document.getElementById('accessNotes').value = instructions.accessNotes || '';
-            }
+        if (propertiesError) {
+          console.error('Error loading property:', propertiesError);
+          return;
+        }
+
+        if (properties) {
+          document.getElementById('propertyName').value = properties.name || '';
+          document.getElementById('propertyAddress').value = properties.address || '';
+          
+          // Load property instructions
+          const { success: instructionsSuccess, data: instructionsData } = await window.supabaseFunctions.getPropertyInstructions(propertyId);
+          
+          if (instructionsSuccess && instructionsData) {
+            const instructions = instructionsData.instructions;
+            document.getElementById('packageLocation').value = instructions.packageLocation || '';
+            document.getElementById('specialInstructions').value = instructions.specialInstructions || '';
+            document.getElementById('accessCode').value = instructions.accessCode || '';
+            document.getElementById('accessNotes').value = instructions.accessNotes || '';
           }
         }
       }
-
-      // Profile button click handler
-      profileButton.addEventListener('click', () => {
-        window.location.href = 'account-settings.html';
-      });
 
       // Form submission handler
       propertyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const formData = {
-          propertyName: document.getElementById('propertyName').value,
-          propertyAddress: document.getElementById('propertyAddress').value,
-          packageLocation: document.getElementById('packageLocation').value,
-          specialInstructions: document.getElementById('specialInstructions').value,
-          accessCode: document.getElementById('accessCode').value,
-          accessNotes: document.getElementById('accessNotes').value
+          name: document.getElementById('propertyName').value,
+          address: document.getElementById('propertyAddress').value,
+          instructions: {
+            packageLocation: document.getElementById('packageLocation').value,
+            specialInstructions: document.getElementById('specialInstructions').value,
+            accessCode: document.getElementById('accessCode').value,
+            accessNotes: document.getElementById('accessNotes').value
+          }
         };
 
         try {
           if (propertyId) {
             // Update existing property
-            const { success } = await updateProperty(propertyId, {
-              name: formData.propertyName,
-              address: formData.propertyAddress
-            });
+            const { error: updateError } = await supabaseClient
+              .from('properties')
+              .update({
+                name: formData.name,
+                address: formData.address
+              })
+              .eq('id', propertyId);
 
-            if (!success) throw new Error('Failed to update property');
+            if (updateError) throw updateError;
 
             // Save property instructions
-            const { success: instructionsSuccess } = await savePropertyInstructions(propertyId, {
-              packageLocation: formData.packageLocation,
-              specialInstructions: formData.specialInstructions,
-              accessCode: formData.accessCode,
-              accessNotes: formData.accessNotes
-            });
+            const { success: instructionsSuccess } = await window.supabaseFunctions.savePropertyInstructions(
+              propertyId,
+              formData.instructions
+            );
 
             if (!instructionsSuccess) throw new Error('Failed to save property instructions');
+
+            alert('Property updated successfully!');
+            window.location.href = 'dashboard.html';
           } else {
             // Create new property
-            const { success, data } = await addProperty({
-              name: formData.propertyName,
-              address: formData.propertyAddress,
-              user_id: user.id
-            });
+            const { data: newProperty, error: createError } = await supabaseClient
+              .from('properties')
+              .insert([{
+                name: formData.name,
+                address: formData.address,
+                landlord_id: user.id
+              }])
+              .select()
+              .single();
 
-            if (!success) throw new Error('Failed to create property');
+            if (createError) throw createError;
 
             // Save property instructions
-            const { success: instructionsSuccess } = await savePropertyInstructions(data.id, {
-              packageLocation: formData.packageLocation,
-              specialInstructions: formData.specialInstructions,
-              accessCode: formData.accessCode,
-              accessNotes: formData.accessNotes
-            });
+            const { success: instructionsSuccess } = await window.supabaseFunctions.savePropertyInstructions(
+              newProperty.id,
+              formData.instructions
+            );
 
             if (!instructionsSuccess) throw new Error('Failed to save property instructions');
-          }
 
-          alert('Property information saved successfully!');
-          window.location.href = 'dashboard.html';
+            alert('Property created successfully!');
+            window.location.href = 'dashboard.html';
+          }
         } catch (error) {
-          console.error('Error saving property information:', error);
-          alert('Failed to save property information. Please try again.');
+          console.error('Error saving property:', error);
+          alert('Failed to save property. Please try again.');
         }
       });
     });
