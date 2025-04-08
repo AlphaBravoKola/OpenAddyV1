@@ -196,8 +196,13 @@ async function deleteProperty(propertyId) {
 // Property Instructions functions
 async function savePropertyInstructions(propertyId, instructions) {
   try {
+    console.log('Saving property instructions:', { propertyId, instructions });
+    
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('No authenticated user found');
+      throw new Error('User not authenticated');
+    }
 
     // First, verify the property belongs to the user
     const { data: property, error: propertyError } = await supabaseClient
@@ -207,19 +212,31 @@ async function savePropertyInstructions(propertyId, instructions) {
       .eq('landlord_id', user.id)
       .single();
 
-    if (propertyError || !property) {
+    if (propertyError) {
+      console.error('Error verifying property ownership:', propertyError);
+      throw new Error('Failed to verify property ownership');
+    }
+
+    if (!property) {
+      console.error('Property not found or unauthorized');
       throw new Error('Property not found or unauthorized');
     }
 
     // Check if instructions already exist
-    const { data: existingInstructions } = await supabaseClient
+    const { data: existingInstructions, error: checkError } = await supabaseClient
       .from('property_instructions')
       .select('id')
       .eq('property_id', propertyId)
       .single();
 
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing instructions:', checkError);
+      throw checkError;
+    }
+
     let result;
     if (existingInstructions) {
+      console.log('Updating existing instructions');
       // Update existing instructions
       result = await supabaseClient
         .from('property_instructions')
@@ -231,8 +248,10 @@ async function savePropertyInstructions(propertyId, instructions) {
           authorizedServices: instructions.authorizedServices,
           updated_at: new Date().toISOString()
         })
-        .eq('property_id', propertyId);
+        .eq('property_id', propertyId)
+        .select();
     } else {
+      console.log('Creating new instructions');
       // Insert new instructions
       result = await supabaseClient
         .from('property_instructions')
@@ -245,21 +264,36 @@ async function savePropertyInstructions(propertyId, instructions) {
           authorizedServices: instructions.authorizedServices,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
-        });
+        })
+        .select();
     }
 
-    if (result.error) throw result.error;
+    if (result.error) {
+      console.error('Error saving instructions:', result.error);
+      throw result.error;
+    }
+
+    console.log('Instructions saved successfully:', result.data);
 
     // Update the property's has_instructions flag
-    await supabaseClient
+    const { error: updateError } = await supabaseClient
       .from('properties')
       .update({ has_instructions: true })
       .eq('id', propertyId);
 
+    if (updateError) {
+      console.error('Error updating has_instructions flag:', updateError);
+      // Don't throw here as the instructions were saved successfully
+    }
+
     return { success: true, data: instructions };
   } catch (error) {
-    console.error('Error saving property instructions:', error);
-    return { success: false, message: error.message };
+    console.error('Error in savePropertyInstructions:', error);
+    return { 
+      success: false, 
+      message: error.message || 'Failed to save property instructions',
+      error: error 
+    };
   }
 }
 

@@ -304,25 +304,38 @@
 
         try {
           if (propertyId) {
+            console.log('Updating existing property:', propertyId);
             // Update existing property
-            const { error: updateError } = await supabaseClient
+            const { data: updatedProperty, error: updateError } = await supabaseClient
               .from('properties')
               .update(formData)
-              .eq('id', propertyId);
+              .eq('id', propertyId)
+              .select()
+              .single();
 
-            if (updateError) throw updateError;
+            if (updateError) {
+              console.error('Error updating property:', updateError);
+              throw updateError;
+            }
+
+            console.log('Property updated:', updatedProperty);
 
             // Save property instructions
-            const { success: instructionsSuccess } = await window.supabaseFunctions.savePropertyInstructions(
+            const { success: instructionsSuccess, message: instructionsError } = await window.supabaseFunctions.savePropertyInstructions(
               propertyId,
               instructionsData
             );
 
-            if (!instructionsSuccess) throw new Error('Failed to save property instructions');
+            if (!instructionsSuccess) {
+              console.error('Error saving instructions:', instructionsError);
+              throw new Error(instructionsError || 'Failed to save property instructions');
+            }
 
+            console.log('Instructions saved successfully');
             alert('Property updated successfully!');
             window.location.href = 'dashboard.html';
           } else {
+            console.log('Creating new property');
             // Create new property
             const { data: newProperty, error: createError } = await supabaseClient
               .from('properties')
@@ -333,22 +346,31 @@
               .select()
               .single();
 
-            if (createError) throw createError;
+            if (createError) {
+              console.error('Error creating property:', createError);
+              throw createError;
+            }
+
+            console.log('New property created:', newProperty);
 
             // Save property instructions
-            const { success: instructionsSuccess } = await window.supabaseFunctions.savePropertyInstructions(
+            const { success: instructionsSuccess, message: instructionsError } = await window.supabaseFunctions.savePropertyInstructions(
               newProperty.id,
               instructionsData
             );
 
-            if (!instructionsSuccess) throw new Error('Failed to save property instructions');
+            if (!instructionsSuccess) {
+              console.error('Error saving instructions:', instructionsError);
+              throw new Error(instructionsError || 'Failed to save property instructions');
+            }
 
+            console.log('Instructions saved successfully');
             alert('Property created successfully!');
             window.location.href = 'dashboard.html';
           }
         } catch (error) {
           console.error('Error saving property:', error);
-          alert('Failed to save property. Please try again.');
+          alert(`Failed to save property: ${error.message}`);
         }
       });
     });
