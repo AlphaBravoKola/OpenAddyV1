@@ -15,6 +15,8 @@
       <p class="mt-2 text-sm text-gray-600">Join OpenAddy to manage your properties</p>
     </div>
     
+    <div id="error-message" class="hidden p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg"></div>
+    
     <form id="signupForm" class="mt-8 space-y-6">
       <div class="rounded-md shadow-sm space-y-4">
         <div>
@@ -53,7 +55,7 @@
       </div>
 
       <div>
-        <button type="submit"
+        <button type="submit" id="signupButton"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
           Create Account
         </button>
@@ -72,9 +74,14 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
+      const signupForm = document.getElementById('signupForm');
+      const errorMessage = document.getElementById('error-message');
+      const signupButton = document.getElementById('signupButton');
+
       // Check if user is already logged in
       const user = await window.supabaseFunctions.getCurrentUser();
       if (user) {
+        console.log('User already logged in:', user);
         if (user.user_metadata.account_type === 'landlord') {
           window.location.href = 'dashboard.html';
         } else {
@@ -84,9 +91,12 @@
       }
 
       // Handle form submission
-      const signupForm = document.getElementById('signupForm');
       signupForm.addEventListener('submit', async function(event) {
         event.preventDefault();
+        
+        // Disable the button and show loading state
+        signupButton.disabled = true;
+        signupButton.innerHTML = 'Creating account...';
         
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
@@ -95,23 +105,38 @@
         const accountType = document.getElementById('accountType').value;
         
         if (!accountType) {
-          alert('Please select an account type');
+          errorMessage.textContent = 'Please select an account type';
+          errorMessage.classList.remove('hidden');
+          signupButton.disabled = false;
+          signupButton.innerHTML = 'Create Account';
           return;
         }
         
-        const result = await window.supabaseFunctions.signUp(
-          email,
-          password,
-          firstName,
-          lastName,
-          accountType
-        );
-        
-        if (result.success) {
-          alert('Account created successfully! Please check your email to verify your account.');
-          window.location.href = 'login.html';
-        } else {
-          alert(result.message || 'Signup failed. Please try again.');
+        try {
+          console.log('Attempting to sign up...');
+          const result = await window.supabaseFunctions.signUp(
+            email,
+            password,
+            firstName,
+            lastName,
+            accountType
+          );
+          
+          if (result.success) {
+            console.log('Sign up successful:', result.data);
+            alert('Account created successfully! Please check your email to verify your account.');
+            window.location.href = 'login.html';
+          } else {
+            throw new Error(result.message || 'Signup failed');
+          }
+        } catch (error) {
+          console.error('Signup error:', error);
+          errorMessage.textContent = error.message || 'Signup failed. Please try again.';
+          errorMessage.classList.remove('hidden');
+        } finally {
+          // Re-enable the button
+          signupButton.disabled = false;
+          signupButton.innerHTML = 'Create Account';
         }
       });
     });

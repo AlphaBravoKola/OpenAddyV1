@@ -5,12 +5,14 @@ const SUPABASE_URL = 'https://cnbbjqapgkvopswduhgb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuYmJqcWFwZ2t2b3Bzd2R1aGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQxMjcxNTgsImV4cCI6MjA1OTcwMzE1OH0.Wm8zunhwE3MQQ81B6_WhXYDnV-kJRjEkp5_6ocYR2wI';
 
 // Initialize Supabase client
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Authentication functions
 async function signUp(email, password, firstName, lastName, accountType) {
   try {
-    const { data, error } = await supabase.auth.signUp({
+    console.log('Attempting to sign up user:', { email, firstName, lastName, accountType });
+    const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
       options: {
@@ -22,30 +24,41 @@ async function signUp(email, password, firstName, lastName, accountType) {
       }
     });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
+    console.log('Signup successful:', data);
     return { success: true, data };
   } catch (error) {
+    console.error('Signup failed:', error);
     return { success: false, message: error.message };
   }
 }
 
 async function signIn(email, password) {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    console.log('Attempting to sign in user:', email);
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password
     });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Signin error:', error);
+      throw error;
+    }
+    console.log('Signin successful:', data);
     return { success: true, data };
   } catch (error) {
+    console.error('Signin failed:', error);
     return { success: false, message: error.message };
   }
 }
 
 async function signOut() {
   try {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
     if (error) throw error;
     return { success: true };
   } catch (error) {
@@ -55,9 +68,11 @@ async function signOut() {
 
 async function getCurrentUser() {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+    if (error) throw error;
     return user;
   } catch (error) {
+    console.error('Error getting current user:', error);
     return null;
   }
 }
@@ -65,10 +80,10 @@ async function getCurrentUser() {
 // Property management functions
 async function addProperty(propertyData) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('properties')
       .insert([
         {
@@ -86,10 +101,10 @@ async function addProperty(propertyData) {
 
 async function getUserProperties() {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('properties')
       .select('*')
       .eq('landlord_id', user.id);
@@ -103,10 +118,10 @@ async function getUserProperties() {
 
 async function updateProperty(propertyId, propertyData) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('properties')
       .update(propertyData)
       .eq('id', propertyId)
@@ -121,10 +136,10 @@ async function updateProperty(propertyId, propertyData) {
 
 async function deleteProperty(propertyId) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('properties')
       .delete()
       .eq('id', propertyId)
@@ -138,7 +153,7 @@ async function deleteProperty(propertyId) {
 }
 
 // Export functions and client
-window.supabase = supabase;
+window.supabase = supabaseClient;
 window.supabaseFunctions = {
   signUp,
   signIn,

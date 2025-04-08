@@ -15,6 +15,8 @@
       <p class="mt-2 text-sm text-gray-600">Sign in to your account</p>
     </div>
     
+    <div id="error-message" class="hidden p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg"></div>
+    
     <form id="loginForm" class="mt-8 space-y-6">
       <div class="rounded-md shadow-sm space-y-4">
         <div>
@@ -32,7 +34,7 @@
       </div>
 
       <div>
-        <button type="submit"
+        <button type="submit" id="loginButton"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
           Sign in
         </button>
@@ -50,26 +52,15 @@
   </div>
 
   <script>
-    // Initialize Supabase client
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Check authentication state
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        const user = session.user;
-        if (user.user_metadata.account_type === 'landlord') {
-          window.location.href = 'dashboard.html';
-        } else {
-          window.location.href = 'driver-dashboard.html';
-        }
-      }
-    });
-
     document.addEventListener('DOMContentLoaded', async function() {
+      const loginForm = document.getElementById('loginForm');
+      const errorMessage = document.getElementById('error-message');
+      const loginButton = document.getElementById('loginButton');
+
       // Check if user is already logged in
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const user = session.user;
+      const user = await window.supabaseFunctions.getCurrentUser();
+      if (user) {
+        console.log('User already logged in:', user);
         if (user.user_metadata.account_type === 'landlord') {
           window.location.href = 'dashboard.html';
         } else {
@@ -79,23 +70,40 @@
       }
 
       // Handle form submission
-      const loginForm = document.getElementById('loginForm');
       loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
+        
+        // Disable the button and show loading state
+        loginButton.disabled = true;
+        loginButton.innerHTML = 'Signing in...';
         
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        
-        if (error) {
-          alert(error.message || 'Login failed. Please check your credentials.');
-        } else {
-          // The onAuthStateChange listener will handle the redirection
-          console.log('Login successful, waiting for redirection...');
+        try {
+          console.log('Attempting to sign in...');
+          const result = await window.supabaseFunctions.signIn(email, password);
+          
+          if (result.success) {
+            console.log('Sign in successful:', result.data);
+            const user = result.data.user;
+            
+            if (user.user_metadata.account_type === 'landlord') {
+              window.location.href = 'dashboard.html';
+            } else {
+              window.location.href = 'driver-dashboard.html';
+            }
+          } else {
+            throw new Error(result.message || 'Login failed');
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          errorMessage.textContent = error.message || 'Login failed. Please check your credentials.';
+          errorMessage.classList.remove('hidden');
+        } finally {
+          // Re-enable the button
+          loginButton.disabled = false;
+          loginButton.innerHTML = 'Sign in';
         }
       });
     });
