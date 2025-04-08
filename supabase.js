@@ -211,16 +211,37 @@ async function savePropertyInstructions(propertyId, instructions) {
       throw new Error('Property not found or unauthorized');
     }
 
-    const { data, error } = await supabaseClient
+    // Check if instructions already exist
+    const { data: existingInstructions } = await supabaseClient
       .from('property_instructions')
-      .upsert({
-        property_id: propertyId,
-        instructions: instructions,
-        updated_at: new Date().toISOString()
-      });
+      .select('id')
+      .eq('property_id', propertyId)
+      .single();
 
-    if (error) throw error;
-    return { success: true, data };
+    let result;
+    if (existingInstructions) {
+      // Update existing instructions
+      result = await supabaseClient
+        .from('property_instructions')
+        .update({
+          instructions: instructions,
+          updated_at: new Date().toISOString()
+        })
+        .eq('property_id', propertyId);
+    } else {
+      // Insert new instructions
+      result = await supabaseClient
+        .from('property_instructions')
+        .insert({
+          property_id: propertyId,
+          instructions: instructions,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+    }
+
+    if (result.error) throw result.error;
+    return { success: true, data: result.data };
   } catch (error) {
     console.error('Error saving property instructions:', error);
     return { success: false, message: error.message };
@@ -249,6 +270,21 @@ async function getPropertyInstructions(propertyId) {
       .select('*')
       .eq('property_id', propertyId)
       .single();
+
+    // If no instructions exist, return empty instructions
+    if (error && error.code === 'PGRST116') {
+      return { 
+        success: true, 
+        data: { 
+          instructions: {
+            packageLocation: '',
+            specialInstructions: '',
+            accessCode: '',
+            accessNotes: ''
+          }
+        } 
+      };
+    }
 
     if (error) throw error;
     return { success: true, data };
