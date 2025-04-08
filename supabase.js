@@ -20,7 +20,8 @@ async function signUp(email, password, firstName, lastName, accountType) {
           first_name: firstName,
           last_name: lastName,
           account_type: accountType
-        }
+        },
+        emailRedirectTo: window.location.origin + '/login.html'
       }
     });
     
