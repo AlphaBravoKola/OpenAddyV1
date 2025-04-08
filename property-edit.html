@@ -126,6 +126,22 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-md" required>
               </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Number of Units</label>
+                <input type="number" id="propertyUnits" class="w-full px-3 py-2 border rounded-md" required min="1">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                <select id="propertyType" class="w-full px-3 py-2 border rounded-md" required>
+                  <option value="">Select type</option>
+                  <option value="apartment">Apartment Building</option>
+                  <option value="condo">Condominium</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="single-family">Single Family Home</option>
+                  <option value="office">Office Building</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -257,6 +273,8 @@
         if (properties) {
           document.getElementById('propertyName').value = properties.name || '';
           document.getElementById('propertyAddress').value = properties.address || '';
+          document.getElementById('propertyUnits').value = properties.units || '';
+          document.getElementById('propertyType').value = properties.type || '';
           
           // Load property instructions
           const { success: instructionsSuccess, data: instructions } = await window.supabaseFunctions.getPropertyInstructions(propertyId);
@@ -285,7 +303,9 @@
         
         const formData = {
           name: document.getElementById('propertyName').value,
-          address: document.getElementById('propertyAddress').value
+          address: document.getElementById('propertyAddress').value,
+          units: parseInt(document.getElementById('propertyUnits').value),
+          type: document.getElementById('propertyType').value
         };
 
         const instructionsData = {
@@ -304,7 +324,7 @@
 
         try {
           if (propertyId) {
-            console.log('Updating existing property:', propertyId);
+            console.log('Updating existing property:', propertyId, formData);
             // Update existing property
             const { data: updatedProperty, error: updateError } = await supabaseClient
               .from('properties')

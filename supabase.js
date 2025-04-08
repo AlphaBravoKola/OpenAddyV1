@@ -121,22 +121,45 @@ async function getCurrentUser() {
 // Property management functions
 async function addProperty(propertyData) {
   try {
+    console.log('Adding new property:', propertyData);
+    
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('User not authenticated');
+      throw new Error('User not authenticated');
+    }
+
+    // Validate required fields
+    if (!propertyData.name || !propertyData.address || !propertyData.units || !propertyData.type) {
+      console.error('Missing required property fields:', propertyData);
+      throw new Error('All property fields are required');
+    }
 
     const { data, error } = await supabaseClient
       .from('properties')
       .insert([
         {
           ...propertyData,
-          landlord_id: user.id
+          landlord_id: user.id,
+          has_instructions: false
         }
-      ]);
+      ])
+      .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error adding property:', error);
+      throw error;
+    }
+
+    console.log('Property added successfully:', data);
     return { success: true, data };
   } catch (error) {
-    return { success: false, message: error.message };
+    console.error('Error in addProperty:', error);
+    return { 
+      success: false, 
+      message: error.message || 'Failed to add property',
+      error: error 
+    };
   }
 }
 
@@ -159,19 +182,41 @@ async function getUserProperties() {
 
 async function updateProperty(propertyId, propertyData) {
   try {
+    console.log('Updating property:', propertyId, propertyData);
+    
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('User not authenticated');
+      throw new Error('User not authenticated');
+    }
+
+    // Validate required fields
+    if (!propertyData.name || !propertyData.address || !propertyData.units || !propertyData.type) {
+      console.error('Missing required property fields:', propertyData);
+      throw new Error('All property fields are required');
+    }
 
     const { data, error } = await supabaseClient
       .from('properties')
       .update(propertyData)
       .eq('id', propertyId)
-      .eq('landlord_id', user.id);
+      .eq('landlord_id', user.id)
+      .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error updating property:', error);
+      throw error;
+    }
+
+    console.log('Property updated successfully:', data);
     return { success: true, data };
   } catch (error) {
-    return { success: false, message: error.message };
+    console.error('Error in updateProperty:', error);
+    return { 
+      success: false, 
+      message: error.message || 'Failed to update property',
+      error: error 
+    };
   }
 }
 
