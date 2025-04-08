@@ -259,10 +259,9 @@
           document.getElementById('propertyAddress').value = properties.address || '';
           
           // Load property instructions
-          const { success: instructionsSuccess, data: instructionsData } = await window.supabaseFunctions.getPropertyInstructions(propertyId);
+          const { success: instructionsSuccess, data: instructions } = await window.supabaseFunctions.getPropertyInstructions(propertyId);
           
-          if (instructionsSuccess && instructionsData) {
-            const instructions = instructionsData.instructions;
+          if (instructionsSuccess && instructions) {
             document.getElementById('packageLocation').value = instructions.packageLocation || '';
             document.getElementById('specialInstructions').value = instructions.specialInstructions || '';
             document.getElementById('accessCode').value = instructions.accessCode || '';
@@ -286,19 +285,20 @@
         
         const formData = {
           name: document.getElementById('propertyName').value,
-          address: document.getElementById('propertyAddress').value,
-          instructions: {
-            packageLocation: document.getElementById('packageLocation').value,
-            specialInstructions: document.getElementById('specialInstructions').value,
-            accessCode: document.getElementById('accessCode').value,
-            accessNotes: document.getElementById('accessNotes').value,
-            authorizedServices: {
-              amazon: document.getElementById('amazon').checked,
-              fedex: document.getElementById('fedex').checked,
-              ups: document.getElementById('ups').checked,
-              usps: document.getElementById('usps').checked,
-              dhl: document.getElementById('dhl').checked
-            }
+          address: document.getElementById('propertyAddress').value
+        };
+
+        const instructionsData = {
+          packageLocation: document.getElementById('packageLocation').value,
+          specialInstructions: document.getElementById('specialInstructions').value,
+          accessCode: document.getElementById('accessCode').value,
+          accessNotes: document.getElementById('accessNotes').value,
+          authorizedServices: {
+            amazon: document.getElementById('amazon').checked,
+            fedex: document.getElementById('fedex').checked,
+            ups: document.getElementById('ups').checked,
+            usps: document.getElementById('usps').checked,
+            dhl: document.getElementById('dhl').checked
           }
         };
 
@@ -307,10 +307,7 @@
             // Update existing property
             const { error: updateError } = await supabaseClient
               .from('properties')
-              .update({
-                name: formData.name,
-                address: formData.address
-              })
+              .update(formData)
               .eq('id', propertyId);
 
             if (updateError) throw updateError;
@@ -318,7 +315,7 @@
             // Save property instructions
             const { success: instructionsSuccess } = await window.supabaseFunctions.savePropertyInstructions(
               propertyId,
-              formData.instructions
+              instructionsData
             );
 
             if (!instructionsSuccess) throw new Error('Failed to save property instructions');
@@ -330,8 +327,7 @@
             const { data: newProperty, error: createError } = await supabaseClient
               .from('properties')
               .insert([{
-                name: formData.name,
-                address: formData.address,
+                ...formData,
                 landlord_id: user.id
               }])
               .select()
@@ -342,7 +338,7 @@
             // Save property instructions
             const { success: instructionsSuccess } = await window.supabaseFunctions.savePropertyInstructions(
               newProperty.id,
-              formData.instructions
+              instructionsData
             );
 
             if (!instructionsSuccess) throw new Error('Failed to save property instructions');

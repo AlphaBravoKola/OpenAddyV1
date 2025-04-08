@@ -224,7 +224,11 @@ async function savePropertyInstructions(propertyId, instructions) {
       result = await supabaseClient
         .from('property_instructions')
         .update({
-          instructions: instructions,
+          packageLocation: instructions.packageLocation,
+          specialInstructions: instructions.specialInstructions,
+          accessCode: instructions.accessCode,
+          accessNotes: instructions.accessNotes,
+          authorizedServices: instructions.authorizedServices,
           updated_at: new Date().toISOString()
         })
         .eq('property_id', propertyId);
@@ -234,14 +238,25 @@ async function savePropertyInstructions(propertyId, instructions) {
         .from('property_instructions')
         .insert({
           property_id: propertyId,
-          instructions: instructions,
+          packageLocation: instructions.packageLocation,
+          specialInstructions: instructions.specialInstructions,
+          accessCode: instructions.accessCode,
+          accessNotes: instructions.accessNotes,
+          authorizedServices: instructions.authorizedServices,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
     }
 
     if (result.error) throw result.error;
-    return { success: true, data: result.data };
+
+    // Update the property's has_instructions flag
+    await supabaseClient
+      .from('properties')
+      .update({ has_instructions: true })
+      .eq('id', propertyId);
+
+    return { success: true, data: instructions };
   } catch (error) {
     console.error('Error saving property instructions:', error);
     return { success: false, message: error.message };
