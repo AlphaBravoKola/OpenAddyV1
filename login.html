@@ -73,6 +73,9 @@
       loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         
+        // Clear any previous error messages
+        errorMessage.classList.add('hidden');
+        
         // Disable the button and show loading state
         loginButton.disabled = true;
         loginButton.innerHTML = 'Signing in...';
@@ -87,6 +90,13 @@
           if (result.success) {
             console.log('Sign in successful:', result.data);
             const user = result.data.user;
+            
+            // Check if email is verified
+            if (!user.email_confirmed_at) {
+              errorMessage.textContent = 'Please verify your email before signing in. Check your inbox for the verification link.';
+              errorMessage.classList.remove('hidden');
+              return;
+            }
             
             if (user.user_metadata.account_type === 'landlord') {
               window.location.href = 'dashboard.html';

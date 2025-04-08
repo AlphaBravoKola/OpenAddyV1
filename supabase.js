@@ -1,17 +1,21 @@
 // Supabase configuration
-// Replace these values with your actual Supabase project credentials
-// You can find these in your Supabase project settings -> API
-const SUPABASE_URL = 'https://cnbbjqapgkvopswduhgb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuYmJqcWFwZ2t2b3Bzd2R1aGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQxMjcxNTgsImV4cCI6MjA1OTcwMzE1OH0.Wm8zunhwE3MQQ81B6_WhXYDnV-kJRjEkp5_6ocYR2wI';
-
 // Initialize Supabase client
 const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = createClient(
+  'https://cnbbjqapgkvopswduhgb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuYmJqcWFwZ2t2b3Bzd2R1aGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQxMjcxNTgsImV4cCI6MjA1OTcwMzE1OH0.Wm8zunhwE3MQQ81B6_WhXYDnV-kJRjEkp5_6ocYR2wI'
+);
 
 // Authentication functions
 async function signUp(email, password, firstName, lastName, accountType) {
   try {
     console.log('Attempting to sign up user:', { email, firstName, lastName, accountType });
+    
+    // Validate input
+    if (!email || !password || !firstName || !lastName || !accountType) {
+      throw new Error('All fields are required');
+    }
+
     const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
@@ -29,17 +33,31 @@ async function signUp(email, password, firstName, lastName, accountType) {
       console.error('Signup error:', error);
       throw error;
     }
+
+    if (!data.user) {
+      throw new Error('Failed to create user account');
+    }
+
     console.log('Signup successful:', data);
     return { success: true, data };
   } catch (error) {
     console.error('Signup failed:', error);
-    return { success: false, message: error.message };
+    return { 
+      success: false, 
+      message: error.message || 'Failed to create account. Please try again.' 
+    };
   }
 }
 
 async function signIn(email, password) {
   try {
     console.log('Attempting to sign in user:', email);
+    
+    // Validate input
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+
     const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password
@@ -49,11 +67,19 @@ async function signIn(email, password) {
       console.error('Signin error:', error);
       throw error;
     }
+
+    if (!data.user) {
+      throw new Error('Invalid email or password');
+    }
+
     console.log('Signin successful:', data);
     return { success: true, data };
   } catch (error) {
     console.error('Signin failed:', error);
-    return { success: false, message: error.message };
+    return { 
+      success: false, 
+      message: error.message || 'Failed to sign in. Please check your credentials.' 
+    };
   }
 }
 

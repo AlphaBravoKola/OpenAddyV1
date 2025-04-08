@@ -94,18 +94,31 @@
       signupForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         
+        // Clear any previous error messages
+        errorMessage.classList.add('hidden');
+        
         // Disable the button and show loading state
         signupButton.disabled = true;
         signupButton.innerHTML = 'Creating account...';
         
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
-        const email = document.getElementById('email').value;
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const accountType = document.getElementById('accountType').value;
         
-        if (!accountType) {
-          errorMessage.textContent = 'Please select an account type';
+        // Validate input
+        if (!firstName || !lastName || !email || !password || !accountType) {
+          errorMessage.textContent = 'All fields are required';
+          errorMessage.classList.remove('hidden');
+          signupButton.disabled = false;
+          signupButton.innerHTML = 'Create Account';
+          return;
+        }
+
+        // Validate password strength
+        if (password.length < 6) {
+          errorMessage.textContent = 'Password must be at least 6 characters long';
           errorMessage.classList.remove('hidden');
           signupButton.disabled = false;
           signupButton.innerHTML = 'Create Account';
