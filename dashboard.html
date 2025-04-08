@@ -286,51 +286,104 @@
     // Load properties function
     async function loadProperties() {
       const propertiesList = document.getElementById('propertiesList');
-      if (!propertiesList) return;
-      
-      // Clear existing properties
       propertiesList.innerHTML = '';
-      
-      // Get properties for current user
-      const properties = await window.supabaseFunctions.getUserProperties();
-      
-      if (properties.length === 0) {
-        propertiesList.innerHTML = `
-          <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-            <p class="text-gray-600">You haven't added any properties yet.</p>
-            <button onclick="showAddPropertyModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
-              + Add Your First Property
-            </button>
-          </div>
-        `;
-        return;
-      }
-      
-      // Add each property to the list
-      properties.forEach(property => {
-        const propertyElement = document.createElement('div');
-        propertyElement.className = 'bg-white p-5 rounded-lg shadow-sm border border-gray-200';
-        propertyElement.innerHTML = `
-          <div class="flex justify-between">
-            <div>
-              <h3 class="text-lg font-semibold">${property.name}</h3>
-              <p class="text-gray-600">${property.address}</p>
-              <div class="flex items-center mt-2 text-sm text-gray-500">
-                <span class="mr-4">${property.units} Units</span>
-                ${property.has_instructions 
-                  ? '<span class="text-green-600 font-medium">Instructions Set</span>' 
-                  : '<span class="text-amber-600 font-medium">No Instructions</span>'}
+
+      try {
+        const properties = await window.supabaseFunctions.getUserProperties();
+        
+        if (properties.length === 0) {
+          propertiesList.innerHTML = `
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+              <p class="text-gray-500">No properties found. Click "Add Property" to get started.</p>
+            </div>
+          `;
+          return;
+        }
+
+        for (const property of properties) {
+          // Get property instructions
+          const { success: instructionsSuccess, data: instructionsData } = await window.supabaseFunctions.getPropertyInstructions(property.id);
+          const instructions = instructionsSuccess ? instructionsData.instructions : null;
+
+          // Get authorized services
+          const authorizedServices = instructions?.authorizedServices || {
+            amazon: false,
+            fedex: false,
+            ups: false,
+            usps: false,
+            dhl: false
+          };
+
+          // Create service badges
+          const serviceBadges = Object.entries(authorizedServices)
+            .filter(([_, enabled]) => enabled)
+            .map(([service]) => `
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                ${service.charAt(0).toUpperCase() + service.slice(1)}
+              </span>
+            `)
+            .join('');
+
+          propertiesList.innerHTML += `
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-800">${property.name}</h3>
+                  <p class="text-gray-600">${property.address}</p>
+                </div>
+                <div class="flex space-x-2">
+                  <button 
+                    onclick="window.location.href='property-edit.html?id=${property.id}'"
+                    class="p-2 text-gray-500 hover:text-gray-700"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button 
+                    onclick="deleteProperty('${property.id}')"
+                    class="p-2 text-red-500 hover:text-red-700"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 6h18"></path>
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">Delivery Instructions</h4>
+                  <p class="text-gray-600">${instructions?.packageLocation || 'No delivery instructions set'}</p>
+                </div>
+
+                <div>
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">Authorized Delivery Services</h4>
+                  <div class="flex flex-wrap gap-2">
+                    ${serviceBadges || '<span class="text-gray-500">No authorized services</span>'}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">Access Information</h4>
+                  <p class="text-gray-600">${instructions?.accessCode ? `Code: ${instructions.accessCode}` : 'No access code set'}</p>
+                  ${instructions?.accessNotes ? `<p class="text-gray-600 mt-1">${instructions.accessNotes}</p>` : ''}
+                </div>
               </div>
             </div>
-            <div class="flex items-center">
-              <a href="property-edit.html?id=${property.id}" class="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-md">
-                ${property.has_instructions ? 'Edit Instructions' : 'Add Instructions'}
-              </a>
-            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading properties:', error);
+        propertiesList.innerHTML = `
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <p class="text-red-500">Error loading properties. Please try again.</p>
           </div>
         `;
-        propertiesList.appendChild(propertyElement);
-      });
+      }
     }
     
     // Function to logout and redirect

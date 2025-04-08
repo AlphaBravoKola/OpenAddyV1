@@ -141,6 +141,31 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Special Instructions</label>
                 <textarea id="specialInstructions" class="w-full px-3 py-2 border rounded-md" rows="3"></textarea>
               </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Authorized Delivery Services</label>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="checkbox" id="amazon" class="mr-2" value="amazon">
+                    <span>Amazon</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" id="fedex" class="mr-2" value="fedex">
+                    <span>FedEx</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" id="ups" class="mr-2" value="ups">
+                    <span>UPS</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" id="usps" class="mr-2" value="usps">
+                    <span>USPS</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" id="dhl" class="mr-2" value="dhl">
+                    <span>DHL</span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -242,6 +267,15 @@
             document.getElementById('specialInstructions').value = instructions.specialInstructions || '';
             document.getElementById('accessCode').value = instructions.accessCode || '';
             document.getElementById('accessNotes').value = instructions.accessNotes || '';
+            
+            // Set authorized services checkboxes
+            if (instructions.authorizedServices) {
+              document.getElementById('amazon').checked = instructions.authorizedServices.amazon || false;
+              document.getElementById('fedex').checked = instructions.authorizedServices.fedex || false;
+              document.getElementById('ups').checked = instructions.authorizedServices.ups || false;
+              document.getElementById('usps').checked = instructions.authorizedServices.usps || false;
+              document.getElementById('dhl').checked = instructions.authorizedServices.dhl || false;
+            }
           }
         }
       }
@@ -257,7 +291,14 @@
             packageLocation: document.getElementById('packageLocation').value,
             specialInstructions: document.getElementById('specialInstructions').value,
             accessCode: document.getElementById('accessCode').value,
-            accessNotes: document.getElementById('accessNotes').value
+            accessNotes: document.getElementById('accessNotes').value,
+            authorizedServices: {
+              amazon: document.getElementById('amazon').checked,
+              fedex: document.getElementById('fedex').checked,
+              ups: document.getElementById('ups').checked,
+              usps: document.getElementById('usps').checked,
+              dhl: document.getElementById('dhl').checked
+            }
           }
         };
 

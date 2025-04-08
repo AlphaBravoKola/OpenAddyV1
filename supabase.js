@@ -271,7 +271,7 @@ async function getPropertyInstructions(propertyId) {
       .eq('property_id', propertyId)
       .single();
 
-    // If no instructions exist, return empty instructions
+    // If no instructions exist, return empty instructions with default authorized services
     if (error && error.code === 'PGRST116') {
       return { 
         success: true, 
@@ -280,7 +280,14 @@ async function getPropertyInstructions(propertyId) {
             packageLocation: '',
             specialInstructions: '',
             accessCode: '',
-            accessNotes: ''
+            accessNotes: '',
+            authorizedServices: {
+              amazon: false,
+              fedex: false,
+              ups: false,
+              usps: false,
+              dhl: false
+            }
           }
         } 
       };
