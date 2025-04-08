@@ -16,6 +16,9 @@ async function signUp(email, password, firstName, lastName, accountType) {
       throw new Error('All fields are required');
     }
 
+    // First, sign out any existing session
+    await supabaseClient.auth.signOut();
+
     const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
@@ -57,6 +60,9 @@ async function signIn(email, password) {
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
+
+    // First, sign out any existing session
+    await supabaseClient.auth.signOut();
 
     const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
