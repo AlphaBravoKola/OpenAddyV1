@@ -276,24 +276,28 @@ async function getPropertyInstructions(propertyId) {
       return { 
         success: true, 
         data: { 
-          instructions: {
-            packageLocation: '',
-            specialInstructions: '',
-            accessCode: '',
-            accessNotes: '',
-            authorizedServices: {
-              amazon: false,
-              fedex: false,
-              ups: false,
-              usps: false,
-              dhl: false
-            }
+          packageLocation: '',
+          specialInstructions: '',
+          accessCode: '',
+          accessNotes: '',
+          authorizedServices: {
+            amazon: false,
+            fedex: false,
+            ups: false,
+            usps: false,
+            dhl: false
           }
-        } 
+        }
       };
     }
 
     if (error) throw error;
+    
+    // If data exists but is in the old format (nested under instructions), extract it
+    if (data.instructions && typeof data.instructions === 'object') {
+      return { success: true, data: data.instructions };
+    }
+    
     return { success: true, data };
   } catch (error) {
     console.error('Error getting property instructions:', error);
