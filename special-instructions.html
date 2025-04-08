@@ -141,6 +141,69 @@
       const cancelBtn = document.getElementById('cancelBtn');
       const instructionsList = document.getElementById('instructionsList');
 
+      // Check if user is logged in
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Load existing instructions
+      async function loadInstructions() {
+        const { success, data } = await getSpecialInstructions(user.id);
+        if (success) {
+          instructionsList.innerHTML = '';
+          data.forEach(instruction => {
+            const instructionElement = document.createElement('div');
+            instructionElement.className = 'bg-gray-50 p-4 rounded-md';
+            instructionElement.innerHTML = `
+              <div class="flex justify-between items-start">
+                <h3 class="font-bold text-lg">${instruction.title}</h3>
+                <div class="flex space-x-2">
+                  <button class="text-blue-600 hover:text-blue-800 edit-btn" data-id="${instruction.id}">Edit</button>
+                  <button class="text-red-600 hover:text-red-800 delete-btn" data-id="${instruction.id}">Delete</button>
+                </div>
+              </div>
+              <p class="mt-2 text-gray-600">${instruction.content}</p>
+            `;
+            instructionsList.appendChild(instructionElement);
+          });
+
+          // Add event listeners for edit and delete buttons
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const instructionId = e.target.dataset.id;
+              const instruction = data.find(i => i.id === instructionId);
+              if (instruction) {
+                document.getElementById('modalTitle').textContent = 'Edit Instruction';
+                document.getElementById('instructionTitle').value = instruction.title;
+                document.getElementById('instructionContent').value = instruction.content;
+                instructionForm.dataset.editId = instructionId;
+                instructionModal.classList.remove('hidden');
+                instructionModal.classList.add('flex');
+              }
+            });
+          });
+
+          document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const instructionId = e.target.dataset.id;
+              if (confirm('Are you sure you want to delete this instruction?')) {
+                const { success } = await deleteSpecialInstruction(instructionId);
+                if (success) {
+                  loadInstructions();
+                } else {
+                  alert('Failed to delete instruction. Please try again.');
+                }
+              }
+            });
+          });
+        }
+      }
+
+      // Load initial instructions
+      loadInstructions();
+
       // Profile button click handler
       profileButton.addEventListener('click', () => {
         window.location.href = 'account-settings.html';
@@ -150,6 +213,7 @@
       addInstructionBtn.addEventListener('click', () => {
         document.getElementById('modalTitle').textContent = 'Add New Instruction';
         instructionForm.reset();
+        delete instructionForm.dataset.editId;
         instructionModal.classList.remove('hidden');
         instructionModal.classList.add('flex');
       });
@@ -165,26 +229,26 @@
         e.preventDefault();
         const title = document.getElementById('instructionTitle').value;
         const content = document.getElementById('instructionContent').value;
+        const instructionId = instructionForm.dataset.editId;
 
         try {
-          // Here you would typically save the instruction to your database
-          console.log('Saving instruction:', { title, content });
+          if (instructionId) {
+            // Update existing instruction
+            const { success } = await supabaseClient
+              .from('special_instructions')
+              .update({ title, content })
+              .eq('id', instructionId);
+            
+            if (!success) throw new Error('Failed to update instruction');
+          } else {
+            // Save new instruction
+            const { success } = await saveSpecialInstruction(user.id, title, content);
+            if (!success) throw new Error('Failed to save instruction');
+          }
           
-          // For now, we'll just add it to the list
-          const instructionElement = document.createElement('div');
-          instructionElement.className = 'bg-gray-50 p-4 rounded-md';
-          instructionElement.innerHTML = `
-            <div class="flex justify-between items-start">
-              <h3 class="font-bold text-lg">${title}</h3>
-              <div class="flex space-x-2">
-                <button class="text-blue-600 hover:text-blue-800">Edit</button>
-                <button class="text-red-600 hover:text-red-800">Delete</button>
-              </div>
-            </div>
-            <p class="mt-2 text-gray-600">${content}</p>
-          `;
-          instructionsList.appendChild(instructionElement);
-
+          // Reload instructions
+          await loadInstructions();
+          
           // Close modal
           instructionModal.classList.add('hidden');
           instructionModal.classList.remove('flex');

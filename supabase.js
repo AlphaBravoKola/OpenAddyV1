@@ -153,6 +153,75 @@ async function deleteProperty(propertyId) {
   }
 }
 
+// Database functions for instructions
+async function savePropertyInstructions(propertyId, instructions) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('property_instructions')
+      .upsert({
+        property_id: propertyId,
+        instructions: instructions,
+        updated_at: new Date().toISOString()
+      });
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error saving property instructions:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+async function saveSpecialInstruction(userId, title, content) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('special_instructions')
+      .insert({
+        user_id: userId,
+        title: title,
+        content: content,
+        created_at: new Date().toISOString()
+      });
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error saving special instruction:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+async function getSpecialInstructions(userId) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('special_instructions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error fetching special instructions:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+async function deleteSpecialInstruction(instructionId) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('special_instructions')
+      .delete()
+      .eq('id', instructionId);
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error deleting special instruction:', error);
+    return { success: false, message: error.message };
+  }
+}
+
 // Export functions and client
 window.supabase = supabaseClient;
 window.supabaseFunctions = {
@@ -163,5 +232,9 @@ window.supabaseFunctions = {
   addProperty,
   getUserProperties,
   updateProperty,
-  deleteProperty
+  deleteProperty,
+  savePropertyInstructions,
+  saveSpecialInstruction,
+  getSpecialInstructions,
+  deleteSpecialInstruction
 }; 
