@@ -279,36 +279,34 @@ async function savePropertyInstructions(propertyId, instructions) {
       throw checkError;
     }
 
+    // Convert camelCase to snake_case for database
+    const instructionsData = {
+      property_id: propertyId,
+      package_location: instructions.packageLocation,
+      special_instructions: instructions.specialInstructions,
+      access_code: instructions.accessCode,
+      access_notes: instructions.accessNotes,
+      authorized_services: instructions.authorizedServices,
+      updated_at: new Date().toISOString()
+    };
+
     let result;
     if (existingInstructions) {
-      console.log('Updating existing instructions');
+      console.log('Updating existing instructions:', instructionsData);
       // Update existing instructions
       result = await supabaseClient
         .from('property_instructions')
-        .update({
-          packageLocation: instructions.packageLocation,
-          specialInstructions: instructions.specialInstructions,
-          accessCode: instructions.accessCode,
-          accessNotes: instructions.accessNotes,
-          authorizedServices: instructions.authorizedServices,
-          updated_at: new Date().toISOString()
-        })
+        .update(instructionsData)
         .eq('property_id', propertyId)
         .select();
     } else {
-      console.log('Creating new instructions');
+      console.log('Creating new instructions:', instructionsData);
       // Insert new instructions
       result = await supabaseClient
         .from('property_instructions')
         .insert({
-          property_id: propertyId,
-          packageLocation: instructions.packageLocation,
-          specialInstructions: instructions.specialInstructions,
-          accessCode: instructions.accessCode,
-          accessNotes: instructions.accessNotes,
-          authorizedServices: instructions.authorizedServices,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          ...instructionsData,
+          created_at: new Date().toISOString()
         })
         .select();
     }
@@ -331,7 +329,16 @@ async function savePropertyInstructions(propertyId, instructions) {
       // Don't throw here as the instructions were saved successfully
     }
 
-    return { success: true, data: instructions };
+    // Convert snake_case back to camelCase for frontend
+    const responseData = {
+      packageLocation: result.data[0].package_location,
+      specialInstructions: result.data[0].special_instructions,
+      accessCode: result.data[0].access_code,
+      accessNotes: result.data[0].access_notes,
+      authorizedServices: result.data[0].authorized_services
+    };
+
+    return { success: true, data: responseData };
   } catch (error) {
     console.error('Error in savePropertyInstructions:', error);
     return { 
@@ -345,7 +352,10 @@ async function savePropertyInstructions(propertyId, instructions) {
 async function getPropertyInstructions(propertyId) {
   try {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('No authenticated user found');
+      throw new Error('User not authenticated');
+    }
 
     // First, verify the property belongs to the user
     const { data: property, error: propertyError } = await supabaseClient
@@ -355,7 +365,13 @@ async function getPropertyInstructions(propertyId) {
       .eq('landlord_id', user.id)
       .single();
 
-    if (propertyError || !property) {
+    if (propertyError) {
+      console.error('Error verifying property ownership:', propertyError);
+      throw new Error('Failed to verify property ownership');
+    }
+
+    if (!property) {
+      console.error('Property not found or unauthorized');
       throw new Error('Property not found or unauthorized');
     }
 
@@ -385,17 +401,28 @@ async function getPropertyInstructions(propertyId) {
       };
     }
 
-    if (error) throw error;
-    
-    // If data exists but is in the old format (nested under instructions), extract it
-    if (data.instructions && typeof data.instructions === 'object') {
-      return { success: true, data: data.instructions };
+    if (error) {
+      console.error('Error fetching instructions:', error);
+      throw error;
     }
-    
-    return { success: true, data };
+
+    // Convert snake_case to camelCase for frontend
+    const responseData = {
+      packageLocation: data.package_location,
+      specialInstructions: data.special_instructions,
+      accessCode: data.access_code,
+      accessNotes: data.access_notes,
+      authorizedServices: data.authorized_services
+    };
+
+    return { success: true, data: responseData };
   } catch (error) {
-    console.error('Error getting property instructions:', error);
-    return { success: false, message: error.message };
+    console.error('Error in getPropertyInstructions:', error);
+    return { 
+      success: false, 
+      message: error.message || 'Failed to get property instructions',
+      error: error 
+    };
   }
 }
 
