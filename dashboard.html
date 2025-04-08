@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - OpenAddy</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="auth.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body class="min-h-screen bg-gray-50">
   <!-- Header -->
@@ -192,35 +193,37 @@
 
   <script>
     // Check if user is logged in
-    document.addEventListener('DOMContentLoaded', function() {
-      if (!isLoggedIn()) {
-        // Redirect to login page if not logged in
+    document.addEventListener('DOMContentLoaded', async function() {
+      const user = await window.supabaseFunctions.getCurrentUser();
+      
+      if (!user) {
         window.location.href = 'login.html';
         return;
       }
       
-      // Get user info
-      const currentUser = getCurrentUser();
-      
       // Make sure user is a landlord
-      if (currentUser.accountType !== 'landlord') {
+      if (user.user_metadata.account_type !== 'landlord') {
         window.location.href = 'driver-dashboard.html';
         return;
       }
       
       // Update user info in header
-      document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
-      document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+      document.getElementById('userInitials').textContent = getInitials(
+        user.user_metadata.first_name,
+        user.user_metadata.last_name
+      );
+      document.getElementById('userName').textContent = 
+        user.user_metadata.first_name + ' ' + user.user_metadata.last_name;
       
       // Load properties
-      loadProperties();
+      await loadProperties();
       
       // Initialize form
       const addPropertyForm = document.getElementById('addPropertyForm');
       if (addPropertyForm) {
-        addPropertyForm.addEventListener('submit', function(event) {
+        addPropertyForm.addEventListener('submit', async function(event) {
           event.preventDefault();
-          addNewProperty();
+          await addNewProperty();
         });
       }
     });
@@ -241,7 +244,7 @@
     }
     
     // Add new property function
-    function addNewProperty() {
+    async function addNewProperty() {
       // Get form values
       const propertyName = document.getElementById('propertyName').value;
       const propertyAddress = document.getElementById('propertyAddress').value;
@@ -258,12 +261,13 @@
       const propertyData = {
         name: propertyName,
         address: propertyAddress,
-        units: propertyUnits,
-        type: propertyType
+        units: parseInt(propertyUnits),
+        type: propertyType,
+        has_instructions: false
       };
       
       // Add property
-      const result = addProperty(propertyData);
+      const result = await window.supabaseFunctions.addProperty(propertyData);
       
       if (result.success) {
         // Close modal
@@ -273,14 +277,14 @@
         document.getElementById('addPropertyForm').reset();
         
         // Reload properties
-        loadProperties();
+        await loadProperties();
       } else {
         alert(result.message || 'Error adding property');
       }
     }
     
     // Load properties function
-    function loadProperties() {
+    async function loadProperties() {
       const propertiesList = document.getElementById('propertiesList');
       if (!propertiesList) return;
       
@@ -288,7 +292,7 @@
       propertiesList.innerHTML = '';
       
       // Get properties for current user
-      const properties = getUserProperties();
+      const properties = await window.supabaseFunctions.getUserProperties();
       
       if (properties.length === 0) {
         propertiesList.innerHTML = `
@@ -304,27 +308,6 @@
       
       // Add each property to the list
       properties.forEach(property => {
-        // Generate carrier badges if instructions exist
-        let carrierBadges = '';
-        if (property.hasInstructions && property.instructions && property.instructions.authorizedCarriers) {
-          const carriers = property.instructions.authorizedCarriers;
-          const activeCarriers = [];
-          
-          if (carriers.fedex) activeCarriers.push('FedEx');
-          if (carriers.ups) activeCarriers.push('UPS');
-          if (carriers.usps) activeCarriers.push('USPS');
-          if (carriers.dhl) activeCarriers.push('DHL');
-          if (carriers.amazon) activeCarriers.push('Amazon');
-          if (carriers.ontrac) activeCarriers.push('OnTrac');
-          if (carriers.lasership) activeCarriers.push('LaserShip');
-          
-          if (activeCarriers.length > 0) {
-            carrierBadges = `<div class="mt-3 flex flex-wrap gap-1">
-              ${activeCarriers.map(c => `<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">${c}</span>`).join('')}
-            </div>`;
-          }
-        }
-        
         const propertyElement = document.createElement('div');
         propertyElement.className = 'bg-white p-5 rounded-lg shadow-sm border border-gray-200';
         propertyElement.innerHTML = `
@@ -334,15 +317,14 @@
               <p class="text-gray-600">${property.address}</p>
               <div class="flex items-center mt-2 text-sm text-gray-500">
                 <span class="mr-4">${property.units} Units</span>
-                ${property.hasInstructions 
+                ${property.has_instructions 
                   ? '<span class="text-green-600 font-medium">Instructions Set</span>' 
                   : '<span class="text-amber-600 font-medium">No Instructions</span>'}
               </div>
-              ${carrierBadges}
             </div>
             <div class="flex items-center">
               <a href="property-edit.html?id=${property.id}" class="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-md">
-                ${property.hasInstructions ? 'Edit Instructions' : 'Add Instructions'}
+                ${property.has_instructions ? 'Edit Instructions' : 'Add Instructions'}
               </a>
             </div>
           </div>
@@ -352,8 +334,8 @@
     }
     
     // Function to logout and redirect
-    function logoutAndRedirect() {
-      logoutUser();
+    async function logoutAndRedirect() {
+      await window.supabaseFunctions.signOut();
       window.location.href = 'index.html';
     }
   </script>
