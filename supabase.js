@@ -95,8 +95,16 @@ async function signOut() {
 
 async function getCurrentUser() {
   try {
-    const { data: { user }, error } = await supabaseClient.auth.getUser();
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
     if (error) throw error;
+    
+    if (!session) {
+      return null;
+    }
+
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError) throw userError;
+    
     return user;
   } catch (error) {
     console.error('Error getting current user:', error);

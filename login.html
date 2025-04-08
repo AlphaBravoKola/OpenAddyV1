@@ -61,10 +61,14 @@
       const user = await window.supabaseFunctions.getCurrentUser();
       if (user) {
         console.log('User already logged in:', user);
-        if (user.user_metadata.account_type === 'landlord') {
-          window.location.href = 'dashboard.html';
-        } else {
-          window.location.href = 'driver-dashboard.html';
+        // Only redirect if the user has a valid session
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          if (user.user_metadata.account_type === 'landlord') {
+            window.location.href = 'dashboard.html';
+          } else {
+            window.location.href = 'driver-dashboard.html';
+          }
         }
         return;
       }
@@ -98,10 +102,16 @@
               return;
             }
             
-            if (user.user_metadata.account_type === 'landlord') {
-              window.location.href = 'dashboard.html';
+            // Verify session exists before redirecting
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+              if (user.user_metadata.account_type === 'landlord') {
+                window.location.href = 'dashboard.html';
+              } else {
+                window.location.href = 'driver-dashboard.html';
+              }
             } else {
-              window.location.href = 'driver-dashboard.html';
+              throw new Error('Failed to establish session');
             }
           } else {
             throw new Error(result.message || 'Login failed');
