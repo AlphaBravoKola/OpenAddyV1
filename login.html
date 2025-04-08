@@ -50,10 +50,26 @@
   </div>
 
   <script>
+    // Initialize Supabase client
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Check authentication state
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        const user = session.user;
+        if (user.user_metadata.account_type === 'landlord') {
+          window.location.href = 'dashboard.html';
+        } else {
+          window.location.href = 'driver-dashboard.html';
+        }
+      }
+    });
+
     document.addEventListener('DOMContentLoaded', async function() {
       // Check if user is already logged in
-      const user = await window.supabaseFunctions.getCurrentUser();
-      if (user) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const user = session.user;
         if (user.user_metadata.account_type === 'landlord') {
           window.location.href = 'dashboard.html';
         } else {
@@ -70,16 +86,16 @@
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
-        const result = await window.supabaseFunctions.signIn(email, password);
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
         
-        if (result.success) {
-          if (result.data.user.user_metadata.account_type === 'landlord') {
-            window.location.href = 'dashboard.html';
-          } else {
-            window.location.href = 'driver-dashboard.html';
-          }
+        if (error) {
+          alert(error.message || 'Login failed. Please check your credentials.');
         } else {
-          alert(result.message || 'Login failed. Please check your credentials.');
+          // The onAuthStateChange listener will handle the redirection
+          console.log('Login successful, waiting for redirection...');
         }
       });
     });

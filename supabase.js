@@ -1,8 +1,8 @@
 // Supabase configuration
 // Replace these values with your actual Supabase project credentials
 // You can find these in your Supabase project settings -> API
-const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://abcdefghijklmnopqrst.supabase.co'
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // e.g., 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+const SUPABASE_URL = 'https://cnbbjqapgkvopswduhgb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuYmJqcWFwZ2t2b3Bzd2R1aGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQxMjcxNTgsImV4cCI6MjA1OTcwMzE1OH0.Wm8zunhwE3MQQ81B6_WhXYDnV-kJRjEkp5_6ocYR2wI';
 
 // Initialize Supabase client
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -65,7 +65,7 @@ async function getCurrentUser() {
 // Property management functions
 async function addProperty(propertyData) {
   try {
-    const user = await getCurrentUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -86,7 +86,7 @@ async function addProperty(propertyData) {
 
 async function getUserProperties() {
   try {
-    const user = await getCurrentUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -103,7 +103,7 @@ async function getUserProperties() {
 
 async function updateProperty(propertyId, propertyData) {
   try {
-    const user = await getCurrentUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
@@ -121,7 +121,7 @@ async function updateProperty(propertyId, propertyData) {
 
 async function deleteProperty(propertyId) {
   try {
-    const user = await getCurrentUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { error } = await supabase
@@ -137,7 +137,8 @@ async function deleteProperty(propertyId) {
   }
 }
 
-// Export functions
+// Export functions and client
+window.supabase = supabase;
 window.supabaseFunctions = {
   signUp,
   signIn,
