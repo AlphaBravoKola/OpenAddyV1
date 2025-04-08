@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Property Instructions - OpenAddy</title>
+  <title>Special Instructions - OpenAddy</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body class="min-h-screen bg-gray-50">
   <!-- Header -->
@@ -23,7 +25,7 @@
       
       <div class="flex items-center space-x-4">
         <div class="relative">
-          <button class="flex items-center text-gray-700 hover:text-gray-900">
+          <button id="profileButton" class="flex items-center text-gray-700 hover:text-gray-900">
             <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">JD</div>
             <span class="ml-2 font-medium">John Doe</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
@@ -42,7 +44,7 @@
       <nav class="p-4">
         <ul class="space-y-2">
           <li>
-            <a href="dashboard.html" class="flex items-center px-4 py-3 bg-blue-50 text-blue-600 rounded-md">
+            <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
                 <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
                 <path d="M9 18V9"></path>
@@ -62,7 +64,7 @@
             </a>
           </li>
           <li>
-            <a href="special-instructions.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+            <a href="special-instructions.html" class="flex items-center px-4 py-3 bg-blue-50 text-blue-600 rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
@@ -79,16 +81,6 @@
               <span class="font-medium">Account Settings</span>
             </a>
           </li>
-          <li>
-            <a href="index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              <span class="font-medium">Logout</span>
-            </a>
-          </li>
         </ul>
       </nav>
     </div>
@@ -96,68 +88,46 @@
     <!-- Main content area -->
     <div class="flex-1 p-6">
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center mb-6">
-          <a href="dashboard.html" class="mr-4 text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m15 18-6-6 6-6"></path>
-            </svg>
-          </a>
-          <h2 class="text-2xl font-bold text-gray-800">Edit Property Instructions</h2>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">Special Instructions</h2>
+          <button id="addInstructionBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            Add New Instruction
+          </button>
         </div>
 
-        <form id="propertyForm" class="space-y-6">
-          <!-- Property Details -->
-          <div class="bg-gray-50 p-4 rounded-md">
-            <h3 class="text-lg font-semibold mb-4">Property Details</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Property Name</label>
-                <input type="text" id="propertyName" class="w-full px-3 py-2 border rounded-md" required>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-md" required>
-              </div>
-            </div>
-          </div>
+        <!-- Instructions List -->
+        <div id="instructionsList" class="space-y-4">
+          <!-- Instructions will be dynamically added here -->
+        </div>
 
-          <!-- Delivery Instructions -->
-          <div class="bg-gray-50 p-4 rounded-md">
-            <h3 class="text-lg font-semibold mb-4">Delivery Instructions</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Where to Leave Packages</label>
-                <textarea id="packageLocation" class="w-full px-3 py-2 border rounded-md" rows="3" required></textarea>
+        <!-- Add/Edit Instruction Modal -->
+        <div id="instructionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+          <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4" id="modalTitle">Add New Instruction</h3>
+            <form id="instructionForm">
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="instructionTitle">
+                  Title
+                </label>
+                <input type="text" id="instructionTitle" class="w-full px-3 py-2 border rounded-md" required>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Special Instructions</label>
-                <textarea id="specialInstructions" class="w-full px-3 py-2 border rounded-md" rows="3"></textarea>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="instructionContent">
+                  Content
+                </label>
+                <textarea id="instructionContent" class="w-full px-3 py-2 border rounded-md" rows="4" required></textarea>
               </div>
-            </div>
+              <div class="flex justify-end space-x-2">
+                <button type="button" id="cancelBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                  Cancel
+                </button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                  Save
+                </button>
+              </div>
+            </form>
           </div>
-
-          <!-- Access Information -->
-          <div class="bg-gray-50 p-4 rounded-md">
-            <h3 class="text-lg font-semibold mb-4">Access Information</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Gate/Door Code</label>
-                <input type="text" id="accessCode" class="w-full px-3 py-2 border rounded-md">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Additional Access Notes</label>
-                <textarea id="accessNotes" class="w-full px-3 py-2 border rounded-md" rows="3"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- Save Button -->
-          <div class="flex justify-end">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-              Save Changes
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>
@@ -165,36 +135,65 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const profileButton = document.getElementById('profileButton');
-      const propertyForm = document.getElementById('propertyForm');
+      const addInstructionBtn = document.getElementById('addInstructionBtn');
+      const instructionModal = document.getElementById('instructionModal');
+      const instructionForm = document.getElementById('instructionForm');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const instructionsList = document.getElementById('instructionsList');
 
       // Profile button click handler
       profileButton.addEventListener('click', () => {
         window.location.href = 'account-settings.html';
       });
 
+      // Add instruction button click handler
+      addInstructionBtn.addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent = 'Add New Instruction';
+        instructionForm.reset();
+        instructionModal.classList.remove('hidden');
+        instructionModal.classList.add('flex');
+      });
+
+      // Cancel button click handler
+      cancelBtn.addEventListener('click', () => {
+        instructionModal.classList.add('hidden');
+        instructionModal.classList.remove('flex');
+      });
+
       // Form submission handler
-      propertyForm.addEventListener('submit', async (e) => {
+      instructionForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const formData = {
-          propertyName: document.getElementById('propertyName').value,
-          propertyAddress: document.getElementById('propertyAddress').value,
-          packageLocation: document.getElementById('packageLocation').value,
-          specialInstructions: document.getElementById('specialInstructions').value,
-          accessCode: document.getElementById('accessCode').value,
-          accessNotes: document.getElementById('accessNotes').value
-        };
+        const title = document.getElementById('instructionTitle').value;
+        const content = document.getElementById('instructionContent').value;
 
         try {
-          // Here you would typically save the property information to your database
-          console.log('Saving property information:', formData);
-          alert('Property information saved successfully!');
+          // Here you would typically save the instruction to your database
+          console.log('Saving instruction:', { title, content });
+          
+          // For now, we'll just add it to the list
+          const instructionElement = document.createElement('div');
+          instructionElement.className = 'bg-gray-50 p-4 rounded-md';
+          instructionElement.innerHTML = `
+            <div class="flex justify-between items-start">
+              <h3 class="font-bold text-lg">${title}</h3>
+              <div class="flex space-x-2">
+                <button class="text-blue-600 hover:text-blue-800">Edit</button>
+                <button class="text-red-600 hover:text-red-800">Delete</button>
+              </div>
+            </div>
+            <p class="mt-2 text-gray-600">${content}</p>
+          `;
+          instructionsList.appendChild(instructionElement);
+
+          // Close modal
+          instructionModal.classList.add('hidden');
+          instructionModal.classList.remove('flex');
         } catch (error) {
-          console.error('Error saving property information:', error);
-          alert('Failed to save property information. Please try again.');
+          console.error('Error saving instruction:', error);
+          alert('Failed to save instruction. Please try again.');
         }
       });
     });
   </script>
 </body>
-</html>
+</html> 
