@@ -57,19 +57,6 @@
       const errorMessage = document.getElementById('error-message');
       const loginButton = document.getElementById('loginButton');
 
-      // Check if user is already logged in
-      const user = await window.supabaseFunctions.getCurrentUser();
-      if (user) {
-        console.log('User already logged in:', user);
-        // Only redirect if the user has a valid session
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-          // Clear any existing session
-          await supabaseClient.auth.signOut();
-        }
-        return;
-      }
-
       // Handle form submission
       loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
