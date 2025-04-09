@@ -23,9 +23,24 @@ create table property_instructions (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Package Claims Table
+create table package_claims (
+  id uuid default uuid_generate_v4() primary key,
+  property_id uuid references properties(id) on delete cascade not null,
+  recipient_name text not null,
+  delivery_service text not null,
+  tracking_number text,
+  claim_date timestamp with time zone default timezone('utc'::text, now()) not null,
+  status text not null default 'open',
+  description text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Enable Row Level Security (RLS)
 alter table properties enable row level security;
 alter table property_instructions enable row level security;
+alter table package_claims enable row level security;
 
 -- Create policies
 create policy "Users can view their own properties"
@@ -80,6 +95,47 @@ create policy "Users can delete instructions for their properties"
     exists (
       select 1 from properties
       where properties.id = property_instructions.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+-- Create policies for package_claims
+create policy "Users can view their own property claims"
+  on package_claims for select
+  using (
+    exists (
+      select 1 from properties
+      where properties.id = package_claims.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+create policy "Users can insert claims for their properties"
+  on package_claims for insert
+  with check (
+    exists (
+      select 1 from properties
+      where properties.id = package_claims.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+create policy "Users can update claims for their properties"
+  on package_claims for update
+  using (
+    exists (
+      select 1 from properties
+      where properties.id = package_claims.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+create policy "Users can delete claims for their properties"
+  on package_claims for delete
+  using (
+    exists (
+      select 1 from properties
+      where properties.id = package_claims.property_id
       and properties.landlord_id = auth.uid()
     )
   ); 

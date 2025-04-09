@@ -112,7 +112,7 @@
           </a>
           <h2 class="text-2xl font-bold text-gray-800">Edit Property Instructions</h2>
         </div>
-
+        
         <form id="propertyForm" class="space-y-6">
           <!-- Property Details -->
           <div class="bg-gray-50 p-4 rounded-md">
@@ -122,15 +122,15 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Property Name</label>
                 <input type="text" id="propertyName" class="w-full px-3 py-2 border rounded-md" required>
               </div>
-              <div>
+                <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-md" required>
               </div>
-              <div>
+          <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Number of Units</label>
                 <input type="number" id="propertyUnits" class="w-full px-3 py-2 border rounded-md" required min="1">
               </div>
-              <div>
+          <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
                 <select id="propertyType" class="w-full px-3 py-2 border rounded-md" required>
                   <option value="">Select type</option>
@@ -144,7 +144,7 @@
               </div>
             </div>
           </div>
-
+          
           <!-- Delivery Instructions -->
           <div class="bg-gray-50 p-4 rounded-md">
             <h3 class="text-lg font-semibold mb-4">Delivery Instructions</h3>
@@ -180,26 +180,26 @@
                     <input type="checkbox" id="dhl" class="mr-2" value="dhl">
                     <span>DHL</span>
                   </label>
-                </div>
+              </div>
               </div>
             </div>
           </div>
-
+          
           <!-- Access Information -->
           <div class="bg-gray-50 p-4 rounded-md">
             <h3 class="text-lg font-semibold mb-4">Access Information</h3>
             <div class="space-y-4">
-              <div>
+          <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Gate/Door Code</label>
                 <input type="text" id="accessCode" class="w-full px-3 py-2 border rounded-md">
-              </div>
+                </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Additional Access Notes</label>
                 <textarea id="accessNotes" class="w-full px-3 py-2 border rounded-md" rows="3"></textarea>
               </div>
             </div>
           </div>
-
+          
           <!-- Save Button -->
           <div class="flex justify-end">
             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
@@ -267,9 +267,9 @@
 
         if (propertiesError) {
           console.error('Error loading property:', propertiesError);
-          return;
-        }
-
+        return;
+      }
+      
         if (properties) {
           document.getElementById('propertyName').value = properties.name || '';
           document.getElementById('propertyAddress').value = properties.address || '';
@@ -315,9 +315,9 @@
           accessNotes: document.getElementById('accessNotes').value,
           authorizedServices: {
             amazon: document.getElementById('amazon').checked,
-            fedex: document.getElementById('fedex').checked,
-            ups: document.getElementById('ups').checked,
-            usps: document.getElementById('usps').checked,
+    fedex: document.getElementById('fedex').checked,
+    ups: document.getElementById('ups').checked,
+    usps: document.getElementById('usps').checked,
             dhl: document.getElementById('dhl').checked
           }
         };
@@ -354,7 +354,7 @@
             console.log('Instructions saved successfully');
             alert('Property updated successfully!');
             window.location.href = 'dashboard.html';
-          } else {
+  } else {
             console.log('Creating new property');
             // Create new property
             const { data: newProperty, error: createError } = await supabaseClient
@@ -386,7 +386,7 @@
 
             console.log('Instructions saved successfully');
             alert('Property created successfully!');
-            window.location.href = 'dashboard.html';
+    window.location.href = 'dashboard.html';
           }
         } catch (error) {
           console.error('Error saving property:', error);
