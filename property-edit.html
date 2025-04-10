@@ -9,6 +9,16 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <script src="user-data.js"></script>
+  <!-- Google Maps -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB64eUEMi1_GjzGXqR6NaATKBw5qI7_YGo&libraries=places&callback=initMap" async defer></script>
+  <style>
+    /* Set the size of the map */
+    #map {
+      height: 300px;
+      width: 100%;
+      margin-top: 1rem; /* Add some space above the map */
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-gray-50">
   <!-- Header -->
@@ -123,15 +133,17 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Property Name</label>
                 <input type="text" id="propertyName" class="w-full px-3 py-2 border rounded-md" required>
               </div>
-                <div>
+              <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <input type="text" id="propertyAddress" class="w-full px-3 py-2 border rounded-md" required>
+                <!-- Map container -->
+                <div id="map"></div>
               </div>
-          <div>
+              <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Number of Units</label>
                 <input type="number" id="propertyUnits" class="w-full px-3 py-2 border rounded-md" required min="1">
               </div>
-          <div>
+              <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
                 <select id="propertyType" class="w-full px-3 py-2 border rounded-md" required>
                   <option value="">Select type</option>
@@ -181,7 +193,7 @@
                     <input type="checkbox" id="dhl" class="mr-2" value="dhl">
                     <span>DHL</span>
                   </label>
-              </div>
+                </div>
               </div>
             </div>
           </div>
@@ -190,10 +202,10 @@
           <div class="bg-gray-50 p-4 rounded-md">
             <h3 class="text-lg font-semibold mb-4">Access Information</h3>
             <div class="space-y-4">
-          <div>
+              <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Gate/Door Code</label>
                 <input type="text" id="accessCode" class="w-full px-3 py-2 border rounded-md">
-                </div>
+              </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Additional Access Notes</label>
                 <textarea id="accessNotes" class="w-full px-3 py-2 border rounded-md" rows="3"></textarea>
@@ -276,9 +288,9 @@
 
         if (propertiesError) {
           console.error('Error loading property:', propertiesError);
-        return;
-      }
-      
+          return;
+        }
+        
         if (properties) {
           document.getElementById('propertyName').value = properties.name || '';
           document.getElementById('propertyAddress').value = properties.address || '';
@@ -324,9 +336,9 @@
           accessNotes: document.getElementById('accessNotes').value,
           authorizedServices: {
             amazon: document.getElementById('amazon').checked,
-    fedex: document.getElementById('fedex').checked,
-    ups: document.getElementById('ups').checked,
-    usps: document.getElementById('usps').checked,
+            fedex: document.getElementById('fedex').checked,
+            ups: document.getElementById('ups').checked,
+            usps: document.getElementById('usps').checked,
             dhl: document.getElementById('dhl').checked
           }
         };
@@ -363,7 +375,7 @@
             console.log('Instructions saved successfully');
             alert('Property updated successfully!');
             window.location.href = 'dashboard.html';
-  } else {
+          } else {
             console.log('Creating new property');
             // Create new property
             const { data: newProperty, error: createError } = await supabaseClient
@@ -395,14 +407,89 @@
 
             console.log('Instructions saved successfully');
             alert('Property created successfully!');
-    window.location.href = 'dashboard.html';
+            window.location.href = 'dashboard.html';
           }
         } catch (error) {
           console.error('Error saving property:', error);
           alert(`Failed to save property: ${error.message}`);
         }
       });
-    });
+    }); // End of DOMContentLoaded listener
+
+    // -------- Google Maps Initialization --------
+    let map;
+    let marker;
+    let autocomplete;
+
+    function initMap() {
+      console.log("Google Maps API loaded, initializing map...");
+      const defaultLocation = { lat: 40.7128, lng: -74.0060 }; // Default to NYC
+
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: defaultLocation,
+        zoom: 12, 
+      });
+
+      marker = new google.maps.Marker({
+          map: map,
+          anchorPoint: new google.maps.Point(0, -29), // Adjust marker position if needed
+      });
+
+      const addressInput = document.getElementById('propertyAddress');
+      autocomplete = new google.maps.places.Autocomplete(addressInput, {
+        fields: ["address_components", "geometry", "icon", "name"],
+        types: ["address"], // Restrict to specific address types
+      });
+
+      autocomplete.addListener("place_changed", () => {
+        marker.setVisible(false); // Hide old marker
+        const place = autocomplete.getPlace();
+
+        if (!place.geometry || !place.geometry.location) {
+          // User entered the name of a Place that was not suggested or
+          // did not select a suggestion and pressed Enter.
+          // You might want to alert the user or just clear the map.
+          console.warn("No geometry available for input: ", place.name);
+          // Optionally: map.setCenter(defaultLocation); map.setZoom(12);
+          return;
+        }
+
+        // If the place has geometry, present it on the map.
+        if (place.geometry.viewport) {
+          map.fitBounds(place.geometry.viewport);
+        } else {
+          map.setCenter(place.geometry.location);
+          map.setZoom(17); // Zoom in closer for specific addresses
+        }
+        marker.setPosition(place.geometry.location);
+        marker.setVisible(true);
+
+        // Optionally, update other form fields based on address_components
+        // E.g., fill city/state/zip if you have separate fields
+        // fillInAddress(place);
+      });
+
+      // TODO: When loading an existing property, geocode its address
+      // and set the map/marker initially.
+      // Example: geocodeAddress(document.getElementById('propertyAddress').value);
+    }
+
+    // Optional helper function to geocode an address string (needed for existing properties)
+    // async function geocodeAddress(address) {
+    //   const geocoder = new google.maps.Geocoder();
+    //   geocoder.geocode({ address: address }, (results, status) => {
+    //     if (status === "OK") {
+    //       map.setCenter(results[0].geometry.location);
+    //       marker.setPosition(results[0].geometry.location);
+    //       marker.setVisible(true);
+    //       map.setZoom(17);
+    //     } else {
+    //       console.error("Geocode was not successful for the following reason: " + status);
+    //     }
+    //   });
+    // }
+
+    // TODO: Call geocodeAddress when the form initially loads with property data
   </script>
 </body>
 </html>
