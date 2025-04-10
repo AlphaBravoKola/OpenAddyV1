@@ -17,28 +17,58 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 async function loadProperties() {
+    console.log("Attempting to load properties...");
     try {
         const { data: properties, error } = await window.supabaseFunctions.getUserProperties();
-        if (error) throw error;
+        console.log("getUserProperties returned:", { properties, error });
 
-        // Update property dropdowns
+        if (error) {
+            console.error("Error received directly from getUserProperties:", error);
+            throw error;
+        }
+        
+        if (!properties) {
+            console.warn("getUserProperties returned success, but properties data is null or undefined. Treating as empty array.");
+            properties = []; // Ensure properties is always an array
+        }
+
+        console.log(`Found ${properties.length} properties.`);
+
         const propertySelects = document.querySelectorAll('select[id="filterProperty"], select[id="claimProperty"]');
-        propertySelects.forEach(select => {
-            // Clear existing options except the first one
+        console.log(`Found ${propertySelects.length} select elements to populate.`);
+
+        if (propertySelects.length === 0) {
+            console.warn("Did not find #filterProperty or #claimProperty select elements!");
+            // If the elements genuinely aren't needed, this isn't an error, 
+            // but if they ARE needed, this indicates an HTML issue or timing problem.
+        }
+
+        propertySelects.forEach((select, index) => {
+            console.log(`Processing select element #${index + 1} (ID: ${select.id})`);
+            // Clear existing options except the first one ("All Properties" / "Select property")
             while (select.options.length > 1) {
                 select.remove(1);
             }
+            console.log(`Cleared existing options for #${select.id}`);
 
             // Add properties
-            properties.forEach(property => {
+            properties.forEach((property, propIndex) => {
+                 if (!property || typeof property.id === 'undefined' || typeof property.name === 'undefined') {
+                    console.warn(`Skipping invalid property object at index ${propIndex}:`, property);
+                    return; // Skip this iteration if property object is malformed
+                }
+                console.log(`Adding property ${propIndex + 1}: ${property.name} (ID: ${property.id}) to #${select.id}`);
                 const option = document.createElement('option');
                 option.value = property.id;
                 option.textContent = property.name;
                 select.appendChild(option);
             });
+            console.log(`Finished adding properties to #${select.id}`);
         });
+        console.log("Finished populating property dropdowns.");
+
     } catch (error) {
-        console.error('Error loading properties:', error);
+        console.error('Error caught in loadProperties catch block:', error);
         showError('Failed to load properties');
     }
 }
