@@ -3,20 +3,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Check if user is logged in
     const user = await window.supabaseFunctions.getCurrentUser();
     if (!user) {
-        window.location.href = 'login.html';
-        return;
+        // Although user-data.js also checks, keep a check here 
+        // for page-specific logic if needed, but don't redirect immediately
+        console.warn("User not found in package-claims.js, page might redirect soon.");
+        return; // Stop claims-specific logic if no user
     }
-
-    // Update user display
-    const userInitials = document.getElementById('userInitials');
-    const userName = document.getElementById('userName');
-    if (userInitials && userName) {
-        const firstName = user.user_metadata.first_name || '';
-        const lastName = user.user_metadata.last_name || '';
-        userInitials.textContent = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-        userName.textContent = `${firstName} ${lastName}`;
-    }
-
+    
     // Load properties for dropdowns
     await loadProperties();
     
