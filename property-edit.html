@@ -228,11 +228,19 @@
         return;
       }
 
-      // Set user name and initials
-      const firstName = user.user_metadata.first_name || '';
-      const lastName = user.user_metadata.last_name || '';
-      userName.textContent = `${firstName} ${lastName}`;
-      userInitials.textContent = `${firstName.charAt(0)}${lastName.charAt(0)}`;
+      // Set user name and initials using window.userData
+      const currentUser = window.userData.getCurrentUser();
+      if (currentUser) {
+        const firstName = currentUser.firstName || '';
+        const lastName = currentUser.lastName || '';
+        userName.textContent = `${firstName} ${lastName}`.trim();
+        userInitials.textContent = `${firstName.charAt(0)}${lastName.charAt(0)}`;
+      } else {
+        // Fallback or error handling if currentUser is not available
+        console.error("User data not found in window.userData");
+        // Optionally redirect to login or show a default state
+        // window.location.href = 'login.html'; 
+      }
 
       // Toggle profile menu
       profileButton.addEventListener('click', () => {
