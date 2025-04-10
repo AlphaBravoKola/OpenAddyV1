@@ -7,6 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/supabase-js@2"></script>
   <script src="supabase.js"></script>
+  <script src="user-data.js"></script>
 </head>
 <body class="min-h-screen bg-gray-50">
   <!-- Header -->
@@ -26,7 +27,7 @@
       <div class="flex items-center space-x-4">
         <div class="relative">
           <button id="profileButton" class="flex items-center text-gray-700 hover:text-gray-900">
-            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">JD</div>
+            <div id="userInitials" class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium"></div>
             <span class="ml-2 font-medium" id="userName"></span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -141,16 +142,19 @@
       const cancelBtn = document.getElementById('cancelBtn');
       const instructionsList = document.getElementById('instructionsList');
 
-      // Check if user is logged in
+      // User check and header update is now handled by user-data.js globally
+      // We only need to get the user ID here for fetching instructions
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) {
-        window.location.href = 'login.html';
-        return;
+        console.warn("No user session found, redirecting may happen via user-data.js or auth checks.");
+        // No need to redirect here, user-data.js or other auth checks should handle it
+        return; // Stop execution if no user, as instructions are user-specific
       }
+      const userId = user.id;
 
       // Load existing instructions
       async function loadInstructions() {
-        const { success, data } = await getSpecialInstructions(user.id);
+        const { success, data } = await getSpecialInstructions(userId);
         if (success) {
           instructionsList.innerHTML = '';
           data.forEach(instruction => {
@@ -232,18 +236,23 @@
         const instructionId = instructionForm.dataset.editId;
 
         try {
+          let result;
           if (instructionId) {
             // Update existing instruction
-            const { success } = await supabaseClient
+            result = await supabaseClient
               .from('special_instructions')
               .update({ title, content })
-              .eq('id', instructionId);
-            
-            if (!success) throw new Error('Failed to update instruction');
+              .eq('id', instructionId)
+              .eq('user_id', userId);
           } else {
-            // Save new instruction
-            const { success } = await saveSpecialInstruction(user.id, title, content);
-            if (!success) throw new Error('Failed to save instruction');
+            // Save new instruction using the function from supabase.js if available
+            // Assuming saveSpecialInstruction exists and takes (userId, title, content)
+            result = await saveSpecialInstruction(userId, title, content);
+          }
+
+          if (result.error) {
+            console.error('Error saving/updating instruction:', result.error);
+            throw new Error(result.error.message || 'Failed to save/update instruction');
           }
           
           // Reload instructions
