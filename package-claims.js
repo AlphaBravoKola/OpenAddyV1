@@ -19,45 +19,47 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function loadProperties() {
     console.log("Attempting to load properties...");
     try {
-        const { data: properties, error } = await window.supabaseFunctions.getUserProperties();
-        console.log("getUserProperties returned:", { properties, error });
+        const { data: propertiesData, error: fetchError } = await window.supabaseFunctions.getUserProperties();
+        console.log("getUserProperties returned:", { propertiesData, fetchError });
 
-        if (error) {
-            console.error("Error received directly from getUserProperties:", error);
-            throw error;
-        }
-        
-        if (!properties) {
-            console.warn("getUserProperties returned success, but properties data is null or undefined. Treating as empty array.");
-            properties = []; // Ensure properties is always an array
+        if (fetchError) {
+            console.error("Error received directly from getUserProperties:", fetchError);
+            // Throw a slightly more descriptive error for the catch block
+            throw new Error(`Failed to fetch properties: ${fetchError.message || 'Unknown database error'}`);
         }
 
-        console.log(`Found ${properties.length} properties.`);
+        // Explicitly check if propertiesData is an array before proceeding
+        const properties = Array.isArray(propertiesData) ? propertiesData : [];
+        console.log(`Processing ${properties.length} properties.`);
 
         const propertySelects = document.querySelectorAll('select[id="filterProperty"], select[id="claimProperty"]');
         console.log(`Found ${propertySelects.length} select elements to populate.`);
 
         if (propertySelects.length === 0) {
-            console.warn("Did not find #filterProperty or #claimProperty select elements!");
-            // If the elements genuinely aren't needed, this isn't an error, 
-            // but if they ARE needed, this indicates an HTML issue or timing problem.
+            console.warn("Did not find #filterProperty or #claimProperty select elements! Cannot populate dropdowns.");
+            // This isn't necessarily an error stopping execution, but dropdowns won't be filled.
         }
 
         propertySelects.forEach((select, index) => {
+             // Add a check to ensure 'select' is a valid select element
+            if (!select || typeof select.options === 'undefined') {
+                console.warn(`Element at index ${index} found by querySelectorAll is not a valid <select> element.`);
+                return; // Skip to the next element
+            }
+            
             console.log(`Processing select element #${index + 1} (ID: ${select.id})`);
-            // Clear existing options except the first one ("All Properties" / "Select property")
             while (select.options.length > 1) {
                 select.remove(1);
             }
             console.log(`Cleared existing options for #${select.id}`);
 
-            // Add properties
+            // Loop through properties (safe even if properties is empty array)
             properties.forEach((property, propIndex) => {
                  if (!property || typeof property.id === 'undefined' || typeof property.name === 'undefined') {
                     console.warn(`Skipping invalid property object at index ${propIndex}:`, property);
-                    return; // Skip this iteration if property object is malformed
+                    return;
                 }
-                console.log(`Adding property ${propIndex + 1}: ${property.name} (ID: ${property.id}) to #${select.id}`);
+                // console.log(`Adding property ${propIndex + 1}: ${property.name} (ID: ${property.id}) to #${select.id}`); // Keep console less noisy
                 const option = document.createElement('option');
                 option.value = property.id;
                 option.textContent = property.name;
@@ -65,11 +67,17 @@ async function loadProperties() {
             });
             console.log(`Finished adding properties to #${select.id}`);
         });
-        console.log("Finished populating property dropdowns.");
+        console.log("Finished populating property dropdowns successfully.");
 
     } catch (error) {
-        console.error('Error caught in loadProperties catch block:', error);
-        showError('Failed to load properties');
+        // Log the specific error caught more clearly
+        console.error('Error caught during loadProperties execution:', error);
+        // Try to show a more informative alert
+        let alertMessage = 'Failed to load properties.';
+        if (error instanceof Error && error.message) {
+            alertMessage += ` Reason: ${error.message}`;
+        }
+        showError(alertMessage); // Use the existing showError function to display the alert
     }
 }
 
