@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function loadProperties() {
     try {
-        const { data: properties, error } = await window.supabaseFunctions.getProperties();
+        const { data: properties, error } = await window.supabaseFunctions.getUserProperties();
         if (error) throw error;
 
         // Update property dropdowns
