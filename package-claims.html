@@ -277,47 +277,56 @@
   </div>
 
   <script>
-    // Check if user is logged in
-    if (typeof isLoggedIn === 'function') {
-      if (!isLoggedIn()) {
-        window.location.href = 'index.html';
+    // Check authentication and account type
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Check if user is logged in using Supabase
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        console.log('Session:', session);
+        
+        if (error || !session) {
+          console.error('No valid session:', error);
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Check selected account type
+        const selectedAccountType = localStorage.getItem('selectedAccountType');
+        console.log('Selected Account Type:', selectedAccountType);
+        
+        if (selectedAccountType !== 'landlord') {
+          console.log('User is not accessing as landlord, redirecting to driver dashboard');
+          window.location.href = 'driver-dashboard.html';
+          return;
+        }
+        
+        // Get user info
+        const currentUser = getCurrentUser();
+        console.log('Current User:', currentUser);
+        
+        // Update user info in header
+        document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
+        document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+        
+        // Load properties for dropdown
+        loadPropertiesForDropdown();
+        
+        // Load claims
+        loadClaims();
+        
+        // Initialize form
+        const addClaimForm = document.getElementById('addClaimForm');
+        if (addClaimForm) {
+          addClaimForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            addNewClaim();
+          });
+        }
+      } catch (error) {
+        console.error('Error during initialization:', error);
+        window.location.href = 'login.html';
       }
-    } else {
-      console.error('isLoggedIn function is not defined');
-      window.location.href = 'index.html';
-    }
-    
-    // Get user info
-    const currentUser = getCurrentUser();
-    console.log('Current User:', currentUser);
-    
-    // Make sure user is accessing as a landlord
-    const selectedAccountType = localStorage.getItem('selectedAccountType');
-    console.log('Selected Account Type:', selectedAccountType);
-    
-    if (selectedAccountType !== 'landlord') {
-      console.log('User is not accessing as landlord, redirecting to driver dashboard');
-      window.location.href = 'driver-dashboard.html';
-    }
-    
-    // Update user info in header
-    document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
-    document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
-    
-    // Load properties for dropdown
-    loadPropertiesForDropdown();
-    
-    // Load claims
-    loadClaims();
-    
-    // Initialize form
-    const addClaimForm = document.getElementById('addClaimForm');
-    if (addClaimForm) {
-      addClaimForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        addNewClaim();
-      });
-    }
+    });
   </script>
 </body>
 </html>
