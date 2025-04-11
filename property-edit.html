@@ -10,11 +10,11 @@
   <script src="supabase.js"></script>
   <script src="user-data.js"></script>
   <!-- Google Maps -->
+  <!--
   <script>
-    // Fetch the API key from Netlify function
     async function initializeGoogleMaps() {
       try {
-        const response = await fetch('/.netlify/functions/get-maps-key');
+        const response = await fetch('/api/maps-key');
         const data = await response.json();
         const script = document.createElement('script');
         script.src = `https://maps.googleapis.com/maps/api/js?key=${data.key}&libraries=places&callback=initMap`;
@@ -23,16 +23,11 @@
         document.head.appendChild(script);
       } catch (error) {
         console.error('Error loading Google Maps:', error);
-        // Fallback to placeholder key for development
-        const script = document.createElement('script');
-        script.src = 'https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap';
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
       }
     }
     initializeGoogleMaps();
   </script>
+  -->
   <style>
     /* Set the size of the map */
     #map {
