@@ -289,9 +289,14 @@
     
     // Get user info
     const currentUser = getCurrentUser();
+    console.log('Current User:', currentUser);
     
-    // Make sure user is a landlord
-    if (currentUser.accountType !== 'landlord') {
+    // Make sure user is accessing as a landlord
+    const selectedAccountType = localStorage.getItem('selectedAccountType');
+    console.log('Selected Account Type:', selectedAccountType);
+    
+    if (selectedAccountType !== 'landlord') {
+      console.log('User is not accessing as landlord, redirecting to driver dashboard');
       window.location.href = 'driver-dashboard.html';
     }
     
