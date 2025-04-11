@@ -280,20 +280,26 @@
     // Check authentication and account type
     document.addEventListener('DOMContentLoaded', async function() {
       try {
-        // Check if user is logged in using Supabase
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
-        console.log('Session:', session);
+        // Get stored session info
+        const storedSession = localStorage.getItem('supabase_session');
+        const selectedAccountType = localStorage.getItem('selectedAccountType');
         
-        if (error || !session) {
-          console.error('No valid session:', error);
-          window.location.href = 'login.html';
-          return;
+        // Only check session if we don't have stored info
+        if (!storedSession || !selectedAccountType) {
+          const { data: { session }, error } = await supabaseClient.auth.getSession();
+          console.log('Session:', session);
+          
+          if (error || !session) {
+            console.error('No valid session:', error);
+            window.location.href = 'login.html';
+            return;
+          }
+          
+          // Store session info
+          localStorage.setItem('supabase_session', JSON.stringify(session));
         }
         
-        // Check selected account type
-        const selectedAccountType = localStorage.getItem('selectedAccountType');
-        console.log('Selected Account Type:', selectedAccountType);
-        
+        // Check account type
         if (selectedAccountType !== 'landlord') {
           console.log('User is not accessing as landlord, redirecting to driver dashboard');
           window.location.href = 'driver-dashboard.html';
@@ -324,7 +330,10 @@
         }
       } catch (error) {
         console.error('Error during initialization:', error);
-        window.location.href = 'login.html';
+        // Only redirect on critical errors
+        if (error.message.includes('session') || error.message.includes('auth')) {
+          window.location.href = 'login.html';
+        }
       }
     });
   </script>
