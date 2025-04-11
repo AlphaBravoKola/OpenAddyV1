@@ -331,7 +331,8 @@
     
     // Load properties for dropdown
     function loadPropertiesForDropdown() {
-      const properties = getUserProperties();
+      const properties = getUserProperties(); // Fetch all properties
+      console.log('Fetched properties:', properties); // Debugging log
       const claimPropertyDropdown = document.getElementById('claimProperty');
       const filterPropertyDropdown = document.getElementById('filterProperty');
       
@@ -353,6 +354,7 @@
         filterOption.textContent = property.name;
         filterPropertyDropdown.appendChild(filterOption);
       });
+      console.log('Dropdowns populated successfully'); // Debugging log
     }
     
     // Add new claim
