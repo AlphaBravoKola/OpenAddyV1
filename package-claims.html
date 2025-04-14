@@ -502,6 +502,15 @@
       const description = document.getElementById('editDescription').value;
 
       try {
+        // First get the current claim to get the update_count
+        const { data: currentClaim, error: fetchError } = await supabaseClient
+          .from('package_claims')
+          .select('update_count')
+          .eq('id', claimId)
+          .single();
+
+        if (fetchError) throw fetchError;
+
         const { data, error } = await supabaseClient
           .from('package_claims')
           .update({
@@ -511,7 +520,7 @@
             tracking_number: trackingNumber,
             description: description,
             updated_at: new Date().toISOString(),
-            update_count: supabaseClient.raw('update_count + 1')
+            update_count: (currentClaim.update_count || 0) + 1
           })
           .eq('id', claimId)
           .select();
@@ -532,6 +541,15 @@
       const resolutionNotes = document.getElementById('editResolutionNotes').value;
 
       try {
+        // First get the current claim to get the update_count
+        const { data: currentClaim, error: fetchError } = await supabaseClient
+          .from('package_claims')
+          .select('update_count')
+          .eq('id', claimId)
+          .single();
+
+        if (fetchError) throw fetchError;
+
         const { data, error } = await supabaseClient
           .from('package_claims')
           .update({
@@ -539,7 +557,7 @@
             resolved_at: new Date().toISOString(),
             resolution_notes: resolutionNotes || null,
             updated_at: new Date().toISOString(),
-            update_count: supabaseClient.raw('update_count + 1')
+            update_count: (currentClaim.update_count || 0) + 1
           })
           .eq('id', claimId)
           .select();
