@@ -528,7 +528,6 @@
 
     async function resolveClaim() {
       const claimId = document.getElementById('editClaimId').value;
-      const resolutionNotes = document.getElementById('editResolutionNotes').value;
 
       try {
         const { data, error } = await supabaseClient
@@ -536,7 +535,6 @@
           .update({
             status: 'resolved',
             resolved_at: new Date().toISOString(),
-            resolution_notes: resolutionNotes || null,
             updated_at: new Date().toISOString()
           })
           .eq('id', claimId)
