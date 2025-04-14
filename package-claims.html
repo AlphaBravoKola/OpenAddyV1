@@ -452,6 +452,25 @@
 
     async function loadClaimData(claimId) {
       try {
+        // Load properties for dropdown
+        const { data: properties, error: propertiesError } = await supabaseClient
+          .from('properties')
+          .select('id, name')
+          .order('name');
+
+        if (propertiesError) throw propertiesError;
+
+        // Populate property dropdown
+        const propertySelect = document.getElementById('editProperty');
+        propertySelect.innerHTML = '<option value="">Select property</option>';
+        properties.forEach(property => {
+          const option = document.createElement('option');
+          option.value = property.id;
+          option.textContent = property.name;
+          propertySelect.appendChild(option);
+        });
+
+        // Load claim data
         const { data: claim, error } = await supabaseClient
           .from('package_claims')
           .select('*')
@@ -518,7 +537,9 @@
           .update({
             status: 'resolved',
             resolved_at: new Date().toISOString(),
-            resolution_notes: resolutionNotes
+            resolution_notes: resolutionNotes || null,
+            updated_at: new Date().toISOString(),
+            update_count: supabaseClient.raw('update_count + 1')
           })
           .eq('id', claimId)
           .select();
