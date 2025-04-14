@@ -289,7 +289,19 @@
       propertiesList.innerHTML = '';
 
       try {
-        const properties = await window.supabaseFunctions.getUserProperties();
+        const response = await window.supabaseFunctions.getUserProperties();
+        
+        if (response.error) {
+          console.error('Error loading properties:', response.error);
+          propertiesList.innerHTML = `
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+              <p class="text-gray-500">Error loading properties. Please try again later.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const properties = response.data || [];
         
         if (properties.length === 0) {
           propertiesList.innerHTML = `
