@@ -534,7 +534,6 @@
           .from('package_claims')
           .update({
             status: 'resolved',
-            resolved_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           })
           .eq('id', claimId)
