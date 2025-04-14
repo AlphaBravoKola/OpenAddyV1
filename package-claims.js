@@ -117,20 +117,33 @@ async function loadClaims() {
 
         claims.forEach(claim => {
             const claimElement = document.createElement('div');
-            claimElement.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200';
+            claimElement.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50';
+            claimElement.onclick = () => showEditClaimModal(claim.id);
+            
+            const statusColor = claim.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
+                              claim.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                              'bg-blue-100 text-blue-800';
+            
+            const statusText = claim.status === 'open' ? 'Open' :
+                             claim.status === 'resolved' ? 'Resolved' :
+                             'Investigating';
+            
             claimElement.innerHTML = `
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="font-medium text-gray-900">${claim.recipient_name}</h3>
                         <p class="text-sm text-gray-500">${claim.properties.name}</p>
                     </div>
-                    <span class="px-2 py-1 text-xs font-medium rounded-full ${
-                        claim.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
-                        claim.status === 'investigating' ? 'bg-blue-100 text-blue-800' :
-                        'bg-green-100 text-green-800'
-                    }">
-                        ${claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
-                    </span>
+                    <div class="flex items-center space-x-2">
+                        ${claim.update_count > 0 ? `
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                                Updated ${claim.update_count} times
+                            </span>
+                        ` : ''}
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${statusColor}">
+                            ${statusText}
+                        </span>
+                    </div>
                 </div>
                 <div class="mt-2">
                     <p class="text-sm text-gray-600">
@@ -144,11 +157,28 @@ async function loadClaims() {
                     <p class="text-sm text-gray-600">
                         <span class="font-medium">Claim Date:</span> ${new Date(claim.claim_date).toLocaleDateString()}
                     </p>
+                    ${claim.resolved_at ? `
+                        <p class="text-sm text-gray-600">
+                            <span class="font-medium">Resolved:</span> ${new Date(claim.resolved_at).toLocaleDateString()}
+                        </p>
+                    ` : ''}
+                    ${claim.updated_at ? `
+                        <p class="text-sm text-gray-600">
+                            <span class="font-medium">Last Updated:</span> ${new Date(claim.updated_at).toLocaleDateString()}
+                        </p>
+                    ` : ''}
                 </div>
                 ${claim.description ? `
                     <div class="mt-2">
                         <p class="text-sm text-gray-600">
                             <span class="font-medium">Description:</span> ${claim.description}
+                        </p>
+                    </div>
+                ` : ''}
+                ${claim.resolution_notes ? `
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-600">
+                            <span class="font-medium">Resolution Notes:</span> ${claim.resolution_notes}
                         </p>
                     </div>
                 ` : ''}

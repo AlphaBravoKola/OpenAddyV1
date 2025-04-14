@@ -34,7 +34,10 @@ create table package_claims (
   status text not null default 'open',
   description text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  update_count integer default 0,
+  resolved_at timestamp with time zone,
+  resolution_notes text
 );
 
 -- Enable Row Level Security (RLS)
