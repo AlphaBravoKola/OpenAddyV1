@@ -172,10 +172,15 @@ async function getUserProperties() {
       .select('*')
       .eq('landlord_id', user.id);
 
-    if (error) throw error;
-    return data || [];
+    if (error) {
+      console.error('Error fetching properties:', error);
+      return { data: [], error };
+    }
+    
+    return { data, error: null };
   } catch (error) {
-    return [];
+    console.error('Error in getUserProperties:', error);
+    return { data: [], error };
   }
 }
 
