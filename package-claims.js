@@ -177,13 +177,10 @@ async function handleAddClaim(event) {
     const deliveryService = document.getElementById('deliveryService').value;
     const trackingNumber = document.getElementById('trackingNumber').value;
     const description = document.getElementById('claimDescription').value;
-    const issueType = document.getElementById('claimIssue').value;
-    const packageCount = document.getElementById('packageCount').value;
-    const packageSize = document.getElementById('packageSize').value;
 
     try {
         // Validate required fields
-        if (!propertyId || !recipientName || !deliveryService || !issueType) {
+        if (!propertyId || !recipientName || !deliveryService) {
             showError('Please fill in all required fields');
             return;
         }
@@ -193,10 +190,7 @@ async function handleAddClaim(event) {
             recipientName,
             deliveryService,
             trackingNumber,
-            description,
-            issueType,
-            packageCount,
-            packageSize
+            description
         });
 
         const { data, error } = await supabaseClient
@@ -207,9 +201,6 @@ async function handleAddClaim(event) {
                 delivery_service: deliveryService,
                 tracking_number: trackingNumber,
                 description: description,
-                issue_type: issueType,
-                package_count: parseInt(packageCount),
-                package_size: packageSize,
                 status: 'open',
                 claim_date: new Date().toISOString()
             }])
