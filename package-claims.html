@@ -330,7 +330,7 @@
         if (addClaimForm) {
           addClaimForm.addEventListener('submit', function(event) {
             event.preventDefault();
-            addNewClaim();
+            handleAddClaim(event);
           });
         }
       } catch (error) {

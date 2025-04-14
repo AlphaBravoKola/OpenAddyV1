@@ -177,8 +177,28 @@ async function handleAddClaim(event) {
     const deliveryService = document.getElementById('deliveryService').value;
     const trackingNumber = document.getElementById('trackingNumber').value;
     const description = document.getElementById('claimDescription').value;
+    const issueType = document.getElementById('claimIssue').value;
+    const packageCount = document.getElementById('packageCount').value;
+    const packageSize = document.getElementById('packageSize').value;
 
     try {
+        // Validate required fields
+        if (!propertyId || !recipientName || !deliveryService || !issueType) {
+            showError('Please fill in all required fields');
+            return;
+        }
+
+        console.log('Submitting claim with data:', {
+            propertyId,
+            recipientName,
+            deliveryService,
+            trackingNumber,
+            description,
+            issueType,
+            packageCount,
+            packageSize
+        });
+
         const { data, error } = await supabaseClient
             .from('package_claims')
             .insert([{
@@ -187,17 +207,32 @@ async function handleAddClaim(event) {
                 delivery_service: deliveryService,
                 tracking_number: trackingNumber,
                 description: description,
-                status: 'open'
-            }]);
+                issue_type: issueType,
+                package_count: parseInt(packageCount),
+                package_size: packageSize,
+                status: 'open',
+                claim_date: new Date().toISOString()
+            }])
+            .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error adding claim:', error);
+            throw error;
+        }
 
+        console.log('Claim added successfully:', data);
+
+        // Close modal and reset form
         closeAddClaimModal();
+        document.getElementById('addClaimForm').reset();
+
+        // Reload claims list
         await loadClaims();
+        
         showSuccess('Package claim added successfully');
     } catch (error) {
         console.error('Error adding claim:', error);
-        showError('Failed to add package claim');
+        showError('Failed to add package claim: ' + (error.message || 'Unknown error'));
     }
 }
 
