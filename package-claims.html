@@ -292,48 +292,33 @@
       return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
     }
 
-    // Check authentication and account type
+    // Check if user is logged in
     document.addEventListener('DOMContentLoaded', async function() {
       try {
-        // Get stored session info
-        const storedSession = localStorage.getItem('supabase_session');
-        const selectedAccountType = localStorage.getItem('selectedAccountType');
+        const { data: { user }, error } = await supabaseClient.auth.getUser();
         
-        // Only check session if we don't have stored info
-        if (!storedSession || !selectedAccountType) {
-          const { data: { session }, error } = await supabaseClient.auth.getSession();
-          console.log('Session:', session);
-          
-          if (error || !session) {
-            console.error('No valid session:', error);
-            window.location.href = 'login.html';
-            return;
-          }
-          
-          // Store session info
-          localStorage.setItem('supabase_session', JSON.stringify(session));
+        if (error || !user) {
+          window.location.href = 'login.html';
+          return;
         }
         
-        // Check account type
-        if (selectedAccountType !== 'landlord') {
-          console.log('User is not accessing as landlord, redirecting to driver dashboard');
+        // Make sure user is a landlord
+        if (user.user_metadata.account_type !== 'landlord') {
           window.location.href = 'driver-dashboard.html';
           return;
         }
         
-        // Get user info
-        const currentUser = getCurrentUser();
-        console.log('Current User:', currentUser);
-        
         // Update user info in header
-        document.getElementById('userInitials').textContent = getInitials(currentUser.firstName, currentUser.lastName);
-        document.getElementById('userName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+        const firstName = user.user_metadata.first_name || '';
+        const lastName = user.user_metadata.last_name || '';
+        document.getElementById('userInitials').textContent = getInitials(firstName, lastName);
+        document.getElementById('userName').textContent = `${firstName} ${lastName}`;
         
-        // Load properties for dropdown
-        loadProperties();
+        // Load properties
+        await loadProperties();
         
         // Load claims
-        loadClaims();
+        await loadClaims();
         
         // Initialize form
         const addClaimForm = document.getElementById('addClaimForm');
