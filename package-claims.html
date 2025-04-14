@@ -338,41 +338,7 @@
         // Initialize form
         const addClaimForm = document.getElementById('addClaimForm');
         if (addClaimForm) {
-          addClaimForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const propertyId = document.getElementById('propertyId').value;
-            const recipientName = document.getElementById('recipientName').value;
-            const deliveryService = document.getElementById('deliveryService').value;
-            const trackingNumber = document.getElementById('trackingNumber').value;
-            const claimDate = document.getElementById('claimDate').value;
-            const description = document.getElementById('description').value;
-            
-            try {
-              const { data, error } = await supabase
-                .from('package_claims')
-                .insert([
-                  {
-                    property_id: propertyId,
-                    recipient_name: recipientName,
-                    delivery_service: deliveryService,
-                    tracking_number: trackingNumber,
-                    claim_date: claimDate,
-                    status: 'pending',
-                    description: description
-                  }
-                ]);
-                
-              if (error) throw error;
-              
-              // Close modal and refresh claims
-              document.getElementById('addClaimModal').classList.add('hidden');
-              loadClaims();
-            } catch (error) {
-              console.error('Error submitting claim:', error);
-              alert('Failed to submit claim. Please try again.');
-            }
-          });
+          addClaimForm.addEventListener('submit', handleAddClaim);
         }
       } catch (error) {
         console.error('Error during initialization:', error);
