@@ -129,6 +129,63 @@
             </form>
           </div>
         </div>
+
+        <!-- Add/Edit Notification Modal -->
+        <div id="notificationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+            <div class="fixed inset-0 flex items-center justify-center">
+                <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+                    <h3 class="text-lg font-semibold mb-4">Add New Notification</h3>
+                    <form id="notificationForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Title</label>
+                                <input type="text" id="notificationTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Contents</label>
+                                <textarea id="notificationContents" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Type</label>
+                                <select id="notificationType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                                    <option value="Minor">Minor</option>
+                                    <option value="Urgent">Urgent</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Notification Date</label>
+                                <input type="date" id="notificationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Properties Affected</label>
+                                <select id="propertySelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" multiple required>
+                                    <!-- Properties will be loaded here -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Driver Services Affected</label>
+                                <select id="driverServicesSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" multiple required>
+                                    <option value="Amazon">Amazon</option>
+                                    <option value="FedEx">FedEx</option>
+                                    <option value="UPS">UPS</option>
+                                    <option value="USPS">USPS</option>
+                                    <option value="DHL">DHL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" id="cancelBtn" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
       </div>
     </div>
   </div>
@@ -136,68 +193,98 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const profileButton = document.getElementById('profileButton');
-      const addInstructionBtn = document.getElementById('addInstructionBtn');
-      const instructionModal = document.getElementById('instructionModal');
-      const instructionForm = document.getElementById('instructionForm');
-      const cancelBtn = document.getElementById('cancelBtn');
-      const instructionsList = document.getElementById('instructionsList');
+      const addNotificationBtn = document.getElementById('addInstructionBtn');
+      const notificationModal = document.getElementById('notificationModal');
+      const notificationForm = document.getElementById('notificationForm');
+      const cancelBtn = notificationModal.querySelector('#cancelBtn');
+      const notificationsList = document.getElementById('instructionsList');
 
       // User check and header update is now handled by user-data.js globally
-      // We only need to get the user ID here for fetching instructions
       const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) {
-        console.warn("No user session found, redirecting may happen via user-data.js or auth checks.");
-        // No need to redirect here, user-data.js or other auth checks should handle it
-        return; // Stop execution if no user, as instructions are user-specific
-      }
+      if (!user) return;
       const userId = user.id;
 
-      // Load existing instructions
-      async function loadInstructions() {
-        const { success, data } = await getSpecialInstructions(userId);
+      // Notification CRUD functions
+      async function getNotifications(userId) {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', userId)
+          .order('notification_date', { ascending: false });
+        if (error) return { success: false, data: [] };
+        return { success: true, data };
+      }
+
+      async function saveNotification(userId, notification) {
+        const { data, error } = await supabase
+          .from('notifications')
+          .insert([{ ...notification, user_id: userId }]);
+        if (error) return { success: false, error };
+        return { success: true, data };
+      }
+
+      async function deleteNotification(notificationId) {
+        const { error } = await supabase
+          .from('notifications')
+          .delete()
+          .eq('id', notificationId);
+        return { success: !error };
+      }
+
+      // Load notifications
+      async function loadNotifications() {
+        const { success, data } = await getNotifications(userId);
         if (success) {
-          instructionsList.innerHTML = '';
-          data.forEach(instruction => {
-            const instructionElement = document.createElement('div');
-            instructionElement.className = 'bg-gray-50 p-4 rounded-md';
-            instructionElement.innerHTML = `
+          notificationsList.innerHTML = '';
+          data.forEach(notification => {
+            const notificationElement = document.createElement('div');
+            notificationElement.className = 'bg-gray-50 p-4 rounded-md';
+            notificationElement.innerHTML = `
               <div class="flex justify-between items-start">
-                <h3 class="font-bold text-lg">${instruction.title}</h3>
+                <h3 class="font-bold text-lg">${notification.title}</h3>
                 <div class="flex space-x-2">
-                  <button class="text-blue-600 hover:text-blue-800 edit-btn" data-id="${instruction.id}">Edit</button>
-                  <button class="text-red-600 hover:text-red-800 delete-btn" data-id="${instruction.id}">Delete</button>
+                  <button class="text-blue-600 hover:text-blue-800 edit-btn" data-id="${notification.id}">Edit</button>
+                  <button class="text-red-600 hover:text-red-800 delete-btn" data-id="${notification.id}">Delete</button>
                 </div>
               </div>
-              <p class="mt-2 text-gray-600">${instruction.content}</p>
+              <p class="mt-2 text-gray-600">${notification.contents}</p>
+              <div class="mt-2 text-xs text-gray-500">Type: ${notification.type} | Date: ${notification.notification_date}</div>
             `;
-            instructionsList.appendChild(instructionElement);
+            notificationsList.appendChild(notificationElement);
           });
-
-          // Add event listeners for edit and delete buttons
+          // Add event listeners for edit and delete
           document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
-              const instructionId = e.target.dataset.id;
-              const instruction = data.find(i => i.id === instructionId);
-              if (instruction) {
-                document.getElementById('modalTitle').textContent = 'Edit Instruction';
-                document.getElementById('instructionTitle').value = instruction.title;
-                document.getElementById('instructionContent').value = instruction.content;
-                instructionForm.dataset.editId = instructionId;
-                instructionModal.classList.remove('hidden');
-                instructionModal.classList.add('flex');
+              const notificationId = e.target.dataset.id;
+              const notification = data.find(n => n.id == notificationId);
+              if (notification) {
+                document.getElementById('modalTitle').textContent = 'Edit Notification';
+                document.getElementById('notificationTitle').value = notification.title;
+                document.getElementById('notificationContents').value = notification.contents;
+                document.getElementById('notificationType').value = notification.type;
+                document.getElementById('notificationDate').value = notification.notification_date;
+                // Set multi-selects for properties and driver services
+                Array.from(document.getElementById('propertySelect').options).forEach(opt => {
+                  opt.selected = notification.properties?.includes(opt.value);
+                });
+                Array.from(document.getElementById('driverServicesSelect').options).forEach(opt => {
+                  opt.selected = notification.driver_services?.includes(opt.value);
+                });
+                notificationForm.dataset.editId = notificationId;
+                notificationModal.classList.remove('hidden');
+                notificationModal.classList.add('flex');
               }
             });
           });
-
           document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
-              const instructionId = e.target.dataset.id;
-              if (confirm('Are you sure you want to delete this instruction?')) {
-                const { success } = await deleteSpecialInstruction(instructionId);
+              const notificationId = e.target.dataset.id;
+              if (confirm('Are you sure you want to delete this notification?')) {
+                const { success } = await deleteNotification(notificationId);
                 if (success) {
-                  loadInstructions();
+                  loadNotifications();
                 } else {
-                  alert('Failed to delete instruction. Please try again.');
+                  alert('Failed to delete notification. Please try again.');
                 }
               }
             });
@@ -205,65 +292,60 @@
         }
       }
 
-      // Load initial instructions
-      loadInstructions();
+      // Initial load
+      loadNotifications();
 
       // Profile button click handler
       profileButton.addEventListener('click', () => {
         window.location.href = 'account-settings.html';
       });
 
-      // Add instruction button click handler
-      addInstructionBtn.addEventListener('click', () => {
-        document.getElementById('modalTitle').textContent = 'Add New Instruction';
-        instructionForm.reset();
-        delete instructionForm.dataset.editId;
-        instructionModal.classList.remove('hidden');
-        instructionModal.classList.add('flex');
+      // Add notification button click handler
+      addNotificationBtn.addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent = 'Add New Notification';
+        notificationForm.reset();
+        delete notificationForm.dataset.editId;
+        notificationModal.classList.remove('hidden');
+        notificationModal.classList.add('flex');
       });
 
       // Cancel button click handler
       cancelBtn.addEventListener('click', () => {
-        instructionModal.classList.add('hidden');
-        instructionModal.classList.remove('flex');
+        notificationModal.classList.add('hidden');
+        notificationModal.classList.remove('flex');
       });
 
       // Form submission handler
-      instructionForm.addEventListener('submit', async (e) => {
+      notificationForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const title = document.getElementById('instructionTitle').value;
-        const content = document.getElementById('instructionContent').value;
-        const instructionId = instructionForm.dataset.editId;
-
+        const title = document.getElementById('notificationTitle').value;
+        const contents = document.getElementById('notificationContents').value;
+        const type = document.getElementById('notificationType').value;
+        const notification_date = document.getElementById('notificationDate').value;
+        const properties = Array.from(document.getElementById('propertySelect').selectedOptions).map(opt => opt.value);
+        const driver_services = Array.from(document.getElementById('driverServicesSelect').selectedOptions).map(opt => opt.value);
+        const notificationId = notificationForm.dataset.editId;
         try {
           let result;
-          if (instructionId) {
-            // Update existing instruction
-            result = await supabaseClient
-              .from('special_instructions')
-              .update({ title, content })
-              .eq('id', instructionId)
+          if (notificationId) {
+            // Update existing notification
+            result = await supabase
+              .from('notifications')
+              .update({ title, contents, type, notification_date, properties, driver_services })
+              .eq('id', notificationId)
               .eq('user_id', userId);
           } else {
-            // Save new instruction using the function from supabase.js if available
-            // Assuming saveSpecialInstruction exists and takes (userId, title, content)
-            result = await saveSpecialInstruction(userId, title, content);
+            // Save new notification
+            result = await saveNotification(userId, { title, contents, type, notification_date, properties, driver_services });
           }
-
           if (result.error) {
-            console.error('Error saving/updating instruction:', result.error);
-            throw new Error(result.error.message || 'Failed to save/update instruction');
+            throw new Error(result.error.message || 'Failed to save/update notification');
           }
-          
-          // Reload instructions
-          await loadInstructions();
-          
-          // Close modal
-          instructionModal.classList.add('hidden');
-          instructionModal.classList.remove('flex');
+          await loadNotifications();
+          notificationModal.classList.add('hidden');
+          notificationModal.classList.remove('flex');
         } catch (error) {
-          console.error('Error saving instruction:', error);
-          alert('Failed to save instruction. Please try again.');
+          alert('Failed to save notification. Please try again.');
         }
       });
     });
