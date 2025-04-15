@@ -430,53 +430,109 @@ async function getPropertyInstructions(propertyId) {
   }
 }
 
-// Database functions for instructions
-async function saveSpecialInstruction(userId, title, content) {
+// Property Updates functions
+async function addPropertyUpdate(propertyId, title, content, type, dangerLevel) {
   try {
-    const { data, error } = await supabaseClient
-      .from('special_instructions')
-      .insert({
-        user_id: userId,
-        title: title,
-        content: content,
-        created_at: new Date().toISOString()
-      });
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, message: 'User not authenticated' };
+    }
+
+    // Verify property ownership
+    const { data: property, error: propertyError } = await supabase
+      .from('properties')
+      .select('id')
+      .eq('id', propertyId)
+      .eq('landlord_id', user.id)
+      .single();
+
+    if (propertyError || !property) {
+      return { success: false, message: 'Property not found or unauthorized' };
+    }
+
+    // Add the update
+    const { data, error } = await supabase
+      .from('property_updates')
+      .insert([
+        {
+          property_id: propertyId,
+          title,
+          content,
+          type,
+          danger_level: dangerLevel,
+          active: true
+        }
+      ])
+      .select();
 
     if (error) throw error;
+
     return { success: true, data };
   } catch (error) {
-    console.error('Error saving special instruction:', error);
+    console.error('Error adding property update:', error);
     return { success: false, message: error.message };
   }
 }
 
-async function getSpecialInstructions(userId) {
+async function getPropertyUpdates(propertyId) {
   try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabaseClient
-      .from('special_instructions')
+      .from('property_updates')
       .select('*')
-      .eq('user_id', userId)
+      .eq('property_id', propertyId)
+      .eq('is_active', true)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
-    console.error('Error fetching special instructions:', error);
+    console.error('Error fetching property updates:', error);
     return { success: false, message: error.message };
   }
 }
 
-async function deleteSpecialInstruction(instructionId) {
+async function updatePropertyUpdate(updateId, title, content, type, isActive) {
   try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabaseClient
-      .from('special_instructions')
-      .delete()
-      .eq('id', instructionId);
+      .from('property_updates')
+      .update({
+        title: title,
+        content: content,
+        type: type,
+        is_active: isActive,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', updateId)
+      .select();
 
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
-    console.error('Error deleting special instruction:', error);
+    console.error('Error updating property update:', error);
+    return { success: false, message: error.message };
+  }
+}
+
+async function deletePropertyUpdate(updateId) {
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { error } = await supabaseClient
+      .from('property_updates')
+      .delete()
+      .eq('id', updateId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting property update:', error);
     return { success: false, message: error.message };
   }
 }
@@ -494,7 +550,8 @@ window.supabaseFunctions = {
   deleteProperty,
   savePropertyInstructions,
   getPropertyInstructions,
-  saveSpecialInstruction,
-  getSpecialInstructions,
-  deleteSpecialInstruction
+  addPropertyUpdate,
+  getPropertyUpdates,
+  updatePropertyUpdate,
+  deletePropertyUpdate
 }; 
