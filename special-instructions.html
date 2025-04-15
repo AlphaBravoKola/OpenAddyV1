@@ -1,64 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notify - OpenAddy</title>
-    <link href="styles.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Special Instructions - OpenAddy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="user-data.js"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold mb-4">Notify</h1>
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold">Active Notifications</h2>
-                <button id="addNewBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    Add New Notification
+<body class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <a href="index.html" class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2">
+            <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path>
+            <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"></path>
+            <path d="M12 3v6"></path>
+          </svg>
+          <h1 class="text-xl font-bold text-gray-800">OpenAddy</h1>
+        </a>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <button id="profileButton" class="flex items-center text-gray-700 hover:text-gray-900">
+            <div id="userInitials" class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium"></div>
+            <span class="ml-2 font-medium" id="userName"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white shadow-sm border-r border-gray-200 hidden md:block">
+      <nav class="p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="dashboard.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <path d="M9 18V9"></path>
+                <path d="M15 18v-6"></path>
+              </svg>
+              <span class="font-medium">My Properties</span>
+            </a>
+          </li>
+          <li>
+            <a href="package-claims.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <path d="M12 9v4"></path>
+                <path d="M12 17h.01"></path>
+              </svg>
+              <span class="font-medium">Package Claims</span>
+            </a>
+          </li>
+          <li>
+            <a href="special-instructions.html" class="flex items-center px-4 py-3 bg-blue-50 text-blue-600 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="font-medium">Special Instructions</span>
+            </a>
+          </li>
+          <li>
+            <a href="account-settings.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span class="font-medium">Account Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main content area -->
+    <div class="flex-1 p-6">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">Special Instructions</h2>
+          <button id="addInstructionBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            Add New Instruction
+          </button>
+        </div>
+
+        <!-- Instructions List -->
+        <div id="instructionsList" class="space-y-4">
+          <!-- Instructions will be dynamically added here -->
+        </div>
+
+        <!-- Add/Edit Instruction Modal -->
+        <div id="instructionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+          <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4" id="modalTitle">Add New Instruction</h3>
+            <form id="instructionForm">
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="instructionTitle">
+                  Title
+                </label>
+                <input type="text" id="instructionTitle" class="w-full px-3 py-2 border rounded-md" required>
+              </div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="instructionContent">
+                  Content
+                </label>
+                <textarea id="instructionContent" class="w-full px-3 py-2 border rounded-md" rows="4" required></textarea>
+              </div>
+              <div class="flex justify-end space-x-2">
+                <button type="button" id="cancelBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                  Cancel
                 </button>
-            </div>
-            <div id="notificationsList" class="space-y-4">
-                <!-- Notifications will be loaded here -->
-            </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Add/Edit Notification Modal -->
-    <div id="notificationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
-        <div class="fixed inset-0 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-                <h3 class="text-lg font-semibold mb-4">Add New Notification</h3>
-                <form id="notificationForm">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Property</label>
-                            <select id="propertySelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                                <!-- Properties will be loaded here -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Title</label>
-                            <input type="text" id="notificationTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Message</label>
-                            <textarea id="notificationMessage" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></textarea>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" id="cancelBtn" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">
-                            Cancel
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                            Save
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profileButton = document.getElementById('profileButton');
+      const addInstructionBtn = document.getElementById('addInstructionBtn');
+      const instructionModal = document.getElementById('instructionModal');
+      const instructionForm = document.getElementById('instructionForm');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const instructionsList = document.getElementById('instructionsList');
 
-    <script src="supabase.js"></script>
-    <script src="notifications.js"></script>
+      // User check and header update is now handled by user-data.js globally
+      // We only need to get the user ID here for fetching instructions
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        console.warn("No user session found, redirecting may happen via user-data.js or auth checks.");
+        // No need to redirect here, user-data.js or other auth checks should handle it
+        return; // Stop execution if no user, as instructions are user-specific
+      }
+      const userId = user.id;
+
+      // Load existing instructions
+      async function loadInstructions() {
+        const { success, data } = await getSpecialInstructions(userId);
+        if (success) {
+          instructionsList.innerHTML = '';
+          data.forEach(instruction => {
+            const instructionElement = document.createElement('div');
+            instructionElement.className = 'bg-gray-50 p-4 rounded-md';
+            instructionElement.innerHTML = `
+              <div class="flex justify-between items-start">
+                <h3 class="font-bold text-lg">${instruction.title}</h3>
+                <div class="flex space-x-2">
+                  <button class="text-blue-600 hover:text-blue-800 edit-btn" data-id="${instruction.id}">Edit</button>
+                  <button class="text-red-600 hover:text-red-800 delete-btn" data-id="${instruction.id}">Delete</button>
+                </div>
+              </div>
+              <p class="mt-2 text-gray-600">${instruction.content}</p>
+            `;
+            instructionsList.appendChild(instructionElement);
+          });
+
+          // Add event listeners for edit and delete buttons
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const instructionId = e.target.dataset.id;
+              const instruction = data.find(i => i.id === instructionId);
+              if (instruction) {
+                document.getElementById('modalTitle').textContent = 'Edit Instruction';
+                document.getElementById('instructionTitle').value = instruction.title;
+                document.getElementById('instructionContent').value = instruction.content;
+                instructionForm.dataset.editId = instructionId;
+                instructionModal.classList.remove('hidden');
+                instructionModal.classList.add('flex');
+              }
+            });
+          });
+
+          document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const instructionId = e.target.dataset.id;
+              if (confirm('Are you sure you want to delete this instruction?')) {
+                const { success } = await deleteSpecialInstruction(instructionId);
+                if (success) {
+                  loadInstructions();
+                } else {
+                  alert('Failed to delete instruction. Please try again.');
+                }
+              }
+            });
+          });
+        }
+      }
+
+      // Load initial instructions
+      loadInstructions();
+
+      // Profile button click handler
+      profileButton.addEventListener('click', () => {
+        window.location.href = 'account-settings.html';
+      });
+
+      // Add instruction button click handler
+      addInstructionBtn.addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent = 'Add New Instruction';
+        instructionForm.reset();
+        delete instructionForm.dataset.editId;
+        instructionModal.classList.remove('hidden');
+        instructionModal.classList.add('flex');
+      });
+
+      // Cancel button click handler
+      cancelBtn.addEventListener('click', () => {
+        instructionModal.classList.add('hidden');
+        instructionModal.classList.remove('flex');
+      });
+
+      // Form submission handler
+      instructionForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('instructionTitle').value;
+        const content = document.getElementById('instructionContent').value;
+        const instructionId = instructionForm.dataset.editId;
+
+        try {
+          let result;
+          if (instructionId) {
+            // Update existing instruction
+            result = await supabaseClient
+              .from('special_instructions')
+              .update({ title, content })
+              .eq('id', instructionId)
+              .eq('user_id', userId);
+          } else {
+            // Save new instruction using the function from supabase.js if available
+            // Assuming saveSpecialInstruction exists and takes (userId, title, content)
+            result = await saveSpecialInstruction(userId, title, content);
+          }
+
+          if (result.error) {
+            console.error('Error saving/updating instruction:', result.error);
+            throw new Error(result.error.message || 'Failed to save/update instruction');
+          }
+          
+          // Reload instructions
+          await loadInstructions();
+          
+          // Close modal
+          instructionModal.classList.add('hidden');
+          instructionModal.classList.remove('flex');
+        } catch (error) {
+          console.error('Error saving instruction:', error);
+          alert('Failed to save instruction. Please try again.');
+        }
+      });
+    });
+  </script>
 </body>
 </html> 
