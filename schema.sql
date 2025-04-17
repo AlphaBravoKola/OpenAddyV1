@@ -23,6 +23,19 @@ create table property_instructions (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Property Updates Table
+create table property_updates (
+  id uuid default uuid_generate_v4() primary key,
+  property_id uuid references properties(id) on delete cascade not null,
+  type text not null,
+  danger_level text not null,
+  title text not null,
+  content text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  active boolean default true
+);
+
 -- Package Claims Table
 create table package_claims (
   id uuid default uuid_generate_v4() primary key,
@@ -43,6 +56,7 @@ create table package_claims (
 -- Enable Row Level Security (RLS)
 alter table properties enable row level security;
 alter table property_instructions enable row level security;
+alter table property_updates enable row level security;
 alter table package_claims enable row level security;
 
 -- Create policies
@@ -139,6 +153,47 @@ create policy "Users can delete claims for their properties"
     exists (
       select 1 from properties
       where properties.id = package_claims.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+-- Create policies for property_updates
+create policy "Users can view their own property updates"
+  on property_updates for select
+  using (
+    exists (
+      select 1 from properties
+      where properties.id = property_updates.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+create policy "Users can insert updates for their properties"
+  on property_updates for insert
+  with check (
+    exists (
+      select 1 from properties
+      where properties.id = property_updates.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+create policy "Users can update their property updates"
+  on property_updates for update
+  using (
+    exists (
+      select 1 from properties
+      where properties.id = property_updates.property_id
+      and properties.landlord_id = auth.uid()
+    )
+  );
+
+create policy "Users can delete their property updates"
+  on property_updates for delete
+  using (
+    exists (
+      select 1 from properties
+      where properties.id = property_updates.property_id
       and properties.landlord_id = auth.uid()
     )
   ); 

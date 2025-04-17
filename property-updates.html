@@ -196,11 +196,20 @@
         updatesList.innerHTML = '';
 
         if (filterProperty) {
-          const response = await window.supabaseFunctions.getPropertyUpdates(filterProperty);
-          if (response.error) throw response.error;
+          const { data: updates, error } = await supabaseClient
+            .from('property_updates')
+            .select(`
+              *,
+              properties (
+                name
+              )
+            `)
+            .eq('active', true)
+            .order('created_at', { ascending: false });
 
-          const updates = response.data || [];
-          if (updates.length === 0) {
+          if (error) throw error;
+
+          if (!updates || updates.length === 0) {
             updatesList.innerHTML = '<p class="text-gray-500">No updates found for this property.</p>';
             return;
           }
@@ -257,9 +266,9 @@
       document.getElementById('addUpdateModal').classList.add('hidden');
     }
 
-    // Handle add update form submission
-    document.getElementById('addUpdateForm').addEventListener('submit', async function(event) {
-      event.preventDefault();
+    // Handle form submission
+    document.getElementById('addUpdateForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
       const propertyId = document.getElementById('updateProperty').value;
       const type = document.getElementById('updateType').value;
@@ -268,25 +277,27 @@
       const content = document.getElementById('updateContent').value;
 
       try {
-        const result = await window.supabaseFunctions.addPropertyUpdate(
-          propertyId,
-          title,
-          content,
-          type,
-          dangerLevel
-        );
+        const { data, error } = await supabaseClient
+          .from('property_updates')
+          .insert([
+            {
+              property_id: propertyId,
+              type: type,
+              danger_level: dangerLevel,
+              title: title,
+              content: content,
+              active: true
+            }
+          ]);
 
-        if (result.success) {
-          closeAddUpdateModal();
-          document.getElementById('addUpdateForm').reset();
-          await loadUpdates();
-          alert('Update added successfully!');
-        } else {
-          throw new Error(result.message || 'Failed to add update');
-        }
+        if (error) throw error;
+
+        closeAddUpdateModal();
+        await loadUpdates();
+        document.getElementById('addUpdateForm').reset();
       } catch (error) {
         console.error('Error adding update:', error);
-        alert(error.message || 'Failed to add update. Please try again.');
+        alert('Failed to add update. Please try again.');
       }
     });
 
