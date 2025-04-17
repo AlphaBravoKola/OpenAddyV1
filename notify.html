@@ -131,59 +131,65 @@
         </div>
 
         <!-- Add/Edit Notification Modal -->
-        <div id="notificationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
-            <div class="fixed inset-0 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-                    <h3 class="text-lg font-semibold mb-4">Add New Notification</h3>
-                    <form id="notificationForm">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Title</label>
-                                <input type="text" id="notificationTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Contents</label>
-                                <textarea id="notificationContents" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Type</label>
-                                <select id="notificationType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                                    <option value="Minor">Minor</option>
-                                    <option value="Urgent">Urgent</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Notification Date</label>
-                                <input type="date" id="notificationDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Properties Affected</label>
-                                <select id="propertySelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" multiple required>
-                                    <!-- Properties will be loaded here -->
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Driver Services Affected</label>
-                                <select id="driverServicesSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" multiple required>
-                                    <option value="Amazon">Amazon</option>
-                                    <option value="FedEx">FedEx</option>
-                                    <option value="UPS">UPS</option>
-                                    <option value="USPS">USPS</option>
-                                    <option value="DHL">DHL</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mt-6 flex justify-end space-x-3">
-                            <button type="button" id="cancelBtn" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">
-                                Cancel
-                            </button>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                Save
-                            </button>
-                        </div>
-                    </form>
+        <div id="notificationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800" id="modalTitle">Add New Notification</h3>
+                    <button id="cancelBtn" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
+                <form id="notificationForm">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input type="text" id="notificationTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Contents</label>
+                            <textarea id="notificationContents" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select id="notificationType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="Minor">Minor</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Notification Date</label>
+                            <input type="date" id="notificationDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Properties Affected</label>
+                            <select id="propertySelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" multiple required>
+                                <!-- Properties will be loaded here -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Driver Services Affected</label>
+                            <select id="driverServicesSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" multiple required>
+                                <option value="Amazon">Amazon</option>
+                                <option value="FedEx">FedEx</option>
+                                <option value="UPS">UPS</option>
+                                <option value="USPS">USPS</option>
+                                <option value="DHL">DHL</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" id="cancelBtn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Save
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
       </div>
@@ -206,13 +212,42 @@
 
       // Notification CRUD functions
       async function getNotifications(userId) {
-        const { data, error } = await supabase
+        // Get regular notifications
+        const { data: notifications, error: notificationsError } = await supabase
           .from('notifications')
           .select('*')
           .eq('user_id', userId)
           .order('notification_date', { ascending: false });
-        if (error) return { success: false, data: [] };
-        return { success: true, data };
+
+        // Get package property updates
+        const { data: properties, error: propertiesError } = await supabase
+          .from('properties')
+          .select('id, name, package_updates')
+          .eq('landlord_id', userId);
+
+        if (notificationsError || propertiesError) {
+          console.error('Error fetching updates:', notificationsError || propertiesError);
+          return { success: false, data: [] };
+        }
+
+        // Combine and format all updates
+        const allUpdates = [
+          ...notifications.map(n => ({
+            ...n,
+            type: 'notification',
+            date: n.notification_date
+          })),
+          ...properties.flatMap(p => 
+            (p.package_updates || []).map(update => ({
+              ...update,
+              type: 'package_update',
+              property_name: p.name,
+              date: update.update_date
+            }))
+          )
+        ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        return { success: true, data: allUpdates };
       }
 
       async function saveNotification(userId, notification) {
@@ -236,21 +271,37 @@
         const { success, data } = await getNotifications(userId);
         if (success) {
           notificationsList.innerHTML = '';
-          data.forEach(notification => {
-            const notificationElement = document.createElement('div');
-            notificationElement.className = 'bg-gray-50 p-4 rounded-md';
-            notificationElement.innerHTML = `
+          data.forEach(update => {
+            const updateElement = document.createElement('div');
+            updateElement.className = 'bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-4';
+            
+            const typeBadge = update.type === 'package_update' 
+              ? `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mr-2">Package Update</span>`
+              : `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-2">Notification</span>`;
+
+            const propertyInfo = update.type === 'package_update'
+              ? `<p class="text-sm text-gray-500 mt-1">Property: ${update.property_name}</p>`
+              : '';
+
+            updateElement.innerHTML = `
               <div class="flex justify-between items-start">
-                <h3 class="font-bold text-lg">${notification.title}</h3>
+                <div>
+                  <div class="flex items-center">
+                    ${typeBadge}
+                    <h3 class="font-bold text-lg text-gray-800">${update.title}</h3>
+                  </div>
+                  ${propertyInfo}
+                </div>
                 <div class="flex space-x-2">
-                  <button class="text-blue-600 hover:text-blue-800 edit-btn" data-id="${notification.id}">Edit</button>
-                  <button class="text-red-600 hover:text-red-800 delete-btn" data-id="${notification.id}">Delete</button>
+                  <button class="text-blue-600 hover:text-blue-800 edit-btn" data-id="${update.id}" data-type="${update.type}">Edit</button>
+                  <button class="text-red-600 hover:text-red-800 delete-btn" data-id="${update.id}" data-type="${update.type}">Delete</button>
                 </div>
               </div>
-              <p class="mt-2 text-gray-600">${notification.contents}</p>
-              <div class="mt-2 text-xs text-gray-500">Type: ${notification.type} | Date: ${notification.notification_date}</div>
+              <p class="mt-2 text-gray-600">${update.contents}</p>
+              <p class="text-sm text-gray-500 mt-2">${new Date(update.date).toLocaleDateString()}</p>
             `;
-            notificationsList.appendChild(notificationElement);
+
+            notificationsList.appendChild(updateElement);
           });
           // Add event listeners for edit and delete
           document.querySelectorAll('.edit-btn').forEach(btn => {
@@ -262,7 +313,7 @@
                 document.getElementById('notificationTitle').value = notification.title;
                 document.getElementById('notificationContents').value = notification.contents;
                 document.getElementById('notificationType').value = notification.type;
-                document.getElementById('notificationDate').value = notification.notification_date;
+                document.getElementById('notificationDate').value = notification.date;
                 // Set multi-selects for properties and driver services
                 Array.from(document.getElementById('propertySelect').options).forEach(opt => {
                   opt.selected = notification.properties?.includes(opt.value);
