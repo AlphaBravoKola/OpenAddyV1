@@ -326,11 +326,19 @@
           };
 
           // Create service badges
+          const serviceNames = {
+            amazon: 'Amazon',
+            fedex: 'FedEx',
+            ups: 'UPS',
+            usps: 'USPS',
+            dhl: 'DHL'
+          };
+
           const serviceBadges = Object.entries(authorizedServices)
             .filter(([_, enabled]) => enabled)
             .map(([service]) => `
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                ${service.charAt(0).toUpperCase() + service.slice(1)}
+                ${serviceNames[service] || service}
               </span>
             `)
             .join('');
