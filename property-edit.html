@@ -260,18 +260,17 @@
         return;
       }
 
-      // Set user name and initials using window.userData
-      const currentUser = window.userData.getCurrentUser();
-      if (currentUser) {
-        const firstName = currentUser.firstName || '';
-        const lastName = currentUser.lastName || '';
+      // Set user name and initials
+      const { data: userMetadata } = await supabaseClient.auth.getUser();
+      if (userMetadata && userMetadata.user && userMetadata.user.user_metadata) {
+        const firstName = userMetadata.user.user_metadata.first_name || '';
+        const lastName = userMetadata.user.user_metadata.last_name || '';
         userName.textContent = `${firstName} ${lastName}`.trim();
         userInitials.textContent = `${firstName.charAt(0)}${lastName.charAt(0)}`;
       } else {
-        // Fallback or error handling if currentUser is not available
-        console.error("User data not found in window.userData");
-        // Optionally redirect to login or show a default state
-        // window.location.href = 'login.html'; 
+        console.error("User metadata not found");
+        userName.textContent = user.email || 'User';
+        userInitials.textContent = (user.email || 'U')[0].toUpperCase();
       }
 
       // Toggle profile menu
@@ -318,21 +317,43 @@
           document.getElementById('propertyType').value = properties.type || '';
           
           // Load property instructions
-          const { success: instructionsSuccess, data: instructions } = await window.supabaseFunctions.getPropertyInstructions(propertyId);
+          const { data: instructions, error: instructionsError } = await supabaseClient
+            .from('property_instructions')
+            .select('*')
+            .eq('property_id', propertyId)
+            .single();
           
-          if (instructionsSuccess && instructions) {
-            document.getElementById('packageLocation').value = instructions.packageLocation || '';
-            document.getElementById('specialInstructions').value = instructions.specialInstructions || '';
-            document.getElementById('accessCode').value = instructions.accessCode || '';
-            document.getElementById('accessNotes').value = instructions.accessNotes || '';
+          if (instructionsError && instructionsError.code !== 'PGRST116') {
+            console.error('Error loading instructions:', instructionsError);
+          } else {
+            const defaultInstructions = {
+              package_location: '',
+              special_instructions: '',
+              access_code: '',
+              access_notes: '',
+              authorized_services: {
+                amazon: false,
+                fedex: false,
+                ups: false,
+                usps: false,
+                dhl: false
+              }
+            };
+
+            const propertyInstructions = instructions || defaultInstructions;
+            
+            document.getElementById('packageLocation').value = propertyInstructions.package_location || '';
+            document.getElementById('specialInstructions').value = propertyInstructions.special_instructions || '';
+            document.getElementById('accessCode').value = propertyInstructions.access_code || '';
+            document.getElementById('accessNotes').value = propertyInstructions.access_notes || '';
             
             // Set authorized services checkboxes
-            if (instructions.authorizedServices) {
-              document.getElementById('amazon').checked = instructions.authorizedServices.amazon || false;
-              document.getElementById('fedex').checked = instructions.authorizedServices.fedex || false;
-              document.getElementById('ups').checked = instructions.authorizedServices.ups || false;
-              document.getElementById('usps').checked = instructions.authorizedServices.usps || false;
-              document.getElementById('dhl').checked = instructions.authorizedServices.dhl || false;
+            if (propertyInstructions.authorized_services) {
+              document.getElementById('amazon').checked = propertyInstructions.authorized_services.amazon || false;
+              document.getElementById('fedex').checked = propertyInstructions.authorized_services.fedex || false;
+              document.getElementById('ups').checked = propertyInstructions.authorized_services.ups || false;
+              document.getElementById('usps').checked = propertyInstructions.authorized_services.usps || false;
+              document.getElementById('dhl').checked = propertyInstructions.authorized_services.dhl || false;
             }
           }
         }
@@ -350,11 +371,11 @@
         };
 
         const instructionsData = {
-          packageLocation: document.getElementById('packageLocation').value,
-          specialInstructions: document.getElementById('specialInstructions').value,
-          accessCode: document.getElementById('accessCode').value,
-          accessNotes: document.getElementById('accessNotes').value,
-          authorizedServices: {
+          package_location: document.getElementById('packageLocation').value,
+          special_instructions: document.getElementById('specialInstructions').value,
+          access_code: document.getElementById('accessCode').value,
+          access_notes: document.getElementById('accessNotes').value,
+          authorized_services: {
             amazon: document.getElementById('amazon').checked,
             fedex: document.getElementById('fedex').checked,
             ups: document.getElementById('ups').checked,
@@ -381,15 +402,28 @@
 
             console.log('Property updated:', updatedProperty);
 
-            // Save property instructions
-            const { success: instructionsSuccess, message: instructionsError } = await window.supabaseFunctions.savePropertyInstructions(
-              propertyId,
-              instructionsData
-            );
+            // Update or insert property instructions
+            const { data: existingInstructions } = await supabaseClient
+              .from('property_instructions')
+              .select('*')
+              .eq('property_id', propertyId)
+              .single();
 
-            if (!instructionsSuccess) {
-              console.error('Error saving instructions:', instructionsError);
-              throw new Error(instructionsError || 'Failed to save property instructions');
+            let instructionsResult;
+            if (existingInstructions) {
+              instructionsResult = await supabaseClient
+                .from('property_instructions')
+                .update(instructionsData)
+                .eq('property_id', propertyId);
+            } else {
+              instructionsResult = await supabaseClient
+                .from('property_instructions')
+                .insert([{ ...instructionsData, property_id: propertyId }]);
+            }
+
+            if (instructionsResult.error) {
+              console.error('Error saving instructions:', instructionsResult.error);
+              throw new Error('Failed to save property instructions');
             }
 
             console.log('Instructions saved successfully');
@@ -415,10 +449,12 @@
             console.log('New property created:', newProperty);
 
             // Save property instructions
-            const { success: instructionsSuccess, message: instructionsError } = await window.supabaseFunctions.savePropertyInstructions(
-              newProperty.id,
-              instructionsData
-            );
+            const { success: instructionsSuccess, message: instructionsError } = await supabaseClient
+              .from('property_instructions')
+              .insert([{
+                ...instructionsData,
+                property_id: newProperty.id
+              }]);
 
             if (!instructionsSuccess) {
               console.error('Error saving instructions:', instructionsError);
