@@ -332,11 +332,11 @@
               access_code: '',
               access_notes: '',
               authorized_services: {
-                amazon: false,
-                fedex: false,
-                ups: false,
-                usps: false,
-                dhl: false
+                Amazon: false,
+                FedEx: false,
+                UPS: false,
+                USPS: false,
+                DHL: false
               }
             };
 
@@ -349,11 +349,11 @@
             
             // Set authorized services checkboxes
             if (propertyInstructions.authorized_services) {
-              document.getElementById('amazon').checked = propertyInstructions.authorized_services.amazon || false;
-              document.getElementById('fedex').checked = propertyInstructions.authorized_services.fedex || false;
-              document.getElementById('ups').checked = propertyInstructions.authorized_services.ups || false;
-              document.getElementById('usps').checked = propertyInstructions.authorized_services.usps || false;
-              document.getElementById('dhl').checked = propertyInstructions.authorized_services.dhl || false;
+              document.getElementById('amazon').checked = propertyInstructions.authorized_services.Amazon || false;
+              document.getElementById('fedex').checked = propertyInstructions.authorized_services.FedEx || false;
+              document.getElementById('ups').checked = propertyInstructions.authorized_services.UPS || false;
+              document.getElementById('usps').checked = propertyInstructions.authorized_services.USPS || false;
+              document.getElementById('dhl').checked = propertyInstructions.authorized_services.DHL || false;
             }
           }
         }
@@ -376,11 +376,11 @@
           access_code: document.getElementById('accessCode').value,
           access_notes: document.getElementById('accessNotes').value,
           authorized_services: {
-            amazon: document.getElementById('amazon').checked,
-            fedex: document.getElementById('fedex').checked,
-            ups: document.getElementById('ups').checked,
-            usps: document.getElementById('usps').checked,
-            dhl: document.getElementById('dhl').checked
+            Amazon: document.getElementById('amazon').checked,
+            FedEx: document.getElementById('fedex').checked,
+            UPS: document.getElementById('ups').checked,
+            USPS: document.getElementById('usps').checked,
+            DHL: document.getElementById('dhl').checked
           }
         };
 
