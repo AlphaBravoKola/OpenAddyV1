@@ -33,6 +33,11 @@
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
+          <!-- Profile Dropdown Menu -->
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+            <a href="account-settings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account Settings</a>
+            <button id="logoutButton" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+          </div>
         </div>
       </div>
     </div>
@@ -365,5 +370,6 @@
     // Handle property filter change
     document.getElementById('filterProperty').addEventListener('change', loadUpdates);
   </script>
+  <script src="user-menu.js"></script>
 </body>
 </html> 
